@@ -1,0 +1,4 @@
+Run
+===
+1. python -m SimpleHTTPServer 8000
+2. open localhost:8000
