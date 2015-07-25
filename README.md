@@ -1,1 +1,3 @@
-# procedural-content-generation, baby
+# procedural-content-generation
+
+Build dungeons with code, hater.
