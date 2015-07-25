@@ -8,11 +8,6 @@ canvas.appendTo('body');
 // The stage is a 2d array of tiles.
 var y_max = 5;
 var x_max = 5;
-var init =  function () {
-	var stage =  new Array(y_max);
-	_.fill(stage, _.fill(new Array(x_max), 0));
-	return stage;
-};
 
 var drawTile = function (x, y, tile) {
 	var tile_w = 5;
@@ -62,7 +57,7 @@ var Stage = {
 	// Optionally override with another stage.
 	getStage: function (stage) {
 		if (stage) {
-			_.stage = stage;
+			this._stage = stage;
 		}
 		return {
 			stage: this._stage,
@@ -72,4 +67,3 @@ var Stage = {
 	}
 }
 
-//drawStage(Stage.getStage());
