@@ -37,7 +37,7 @@ var drawStage = function (stage) {
 	}
 };
 
-var stage = {
+var Stage = {
 	_stage: [
 		[1, 1, 1, 1, 1],
 		[1, 0, 0, 0, 1],
@@ -59,7 +59,11 @@ var stage = {
 			throw new Error('Where\'s my GODDAMN array? _stage = ', this._stage);
 		}
 	},
-	getStage: function () {
+	// Optionally override with another stage.
+	getStage: function (stage) {
+		if (stage) {
+			_.stage = stage;
+		}
 		return {
 			stage: this._stage,
 			y_max: this.y_max(),
@@ -68,6 +72,4 @@ var stage = {
 	}
 }
 
-
-drawStage(stage.getStage());
-
+//drawStage(Stage.getStage());
