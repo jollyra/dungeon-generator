@@ -25,24 +25,22 @@ function randomRoom(stage) {
 	return { h: h, w: w, x: x, y: y };
 }
 
+function checkCollisionsOnStage(stage, room) {
+	for(y = room.y; y <= room.y + room.h; y++) {
+		for(x = room.x; x <= room.x + room.w; x++) {
+			if (stage.stage[y][x] !== 0) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 /* Tries a certain number of times to place random sized rooms within the
  * constraints of the supplied stage. Rooms must not overlap.
  */
 function placeRooms(stage, numTries) {
 	var rooms = [];
-
-	function checkCollisions(rooms, newRoom) {
-		_.forEach(rooms, function (room) {
-			for(y = room.y; y <= room.y + room.h; y++) {
-				for(x = room.x; x <= room.x + room.w; x++) {
-					if (stage.stage[y][x] !== 0) {
-						return true;
-					}
-				}
-			}
-		});
-		return false;
-	}
 
 	// Dig the room into the actual stage.
 	function digRoom(stage, room) {
@@ -55,7 +53,7 @@ function placeRooms(stage, numTries) {
 
 	for(i = 0; i < numTries; i++) {
 		var room = randomRoom(stage);
-		if (checkCollisions(rooms, room) === false) {
+		if (checkCollisionsOnStage(stage, room) === false) {
 			digRoom(stage, room);
 			rooms.push(room);
 		} else {
