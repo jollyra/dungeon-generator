@@ -14,20 +14,33 @@ function emptyStage(x, y) {
 }
 
 function randomRoom(stage) {
-	var MAX_WIDTH = 10,
-		MAX_HEIGHT = 8,
-		MIN_WIDTH = 10,
+	var MAX_WIDTH = 15,
+		MAX_HEIGHT = 15,
+		MIN_WIDTH = 3,
 		MIN_HEIGHT = 3,
 		h = _.random(MIN_HEIGHT, MAX_HEIGHT),
 		w = _.random(MIN_WIDTH, MAX_WIDTH),
-		x = _.random(0, stage.x_max - w - 1),
-		y = _.random(0, stage.y_max - h - 1);
-	return { h: h, w: w, x: x, y: y };
+		x = _.random(3, stage.x_max - w - 1 - 3),
+		y = _.random(3, stage.y_max - h - 1 - 3);
+	var room = { h: h, w: w, x: x, y: y };
+	if (x + w >= x_m || y + h >= y_m) {
+		throw new Error('Oi! That room is too big.', room);
+	}
+	return room;
 }
 
 function checkCollisionsOnStage(stage, room) {
-	for(y = room.y; y <= room.y + room.h; y++) {
-		for(x = room.x; x <= room.x + room.w; x++) {
+	// Add padding to room to ensure 3 tiles between nodes.
+	var roomWithPadding = {};
+	roomWithPadding.x = room.x - 3;
+	roomWithPadding.y = room.y - 3;
+	roomWithPadding.h = room.h + 6;
+	roomWithPadding.w = room.w + 6;
+	for(y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
+		for(x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
+			if(x >= x_m || y >= y_m) {
+				console.log(x,y);
+			}
 			if (stage.stage[y][x] !== 0) {
 				return true;
 			}
@@ -65,5 +78,5 @@ function placeRooms(stage, numTries) {
 
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
-var rooms = placeRooms(stage, 10);
+var rooms = placeRooms(stage, 100);
 drawStage(stage);
