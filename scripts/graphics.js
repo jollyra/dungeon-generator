@@ -16,9 +16,12 @@ var drawTile = function (x, y, tile) {
 		0: "#333300",  // Earth
 		1: "#D6C2AD"   // Floor
 	};
-	ctx.fillStyle = TILES[tile];
-	//console.log('x:', x * tile_w, 'y:', y * tile_h, 'x_w:', tile_w, 'y_w:', tile_h, 'tile:', TILES[tile]);
+	// Draw a border around each tile.
+	ctx.fillStyle = "#000000";
 	ctx.fillRect(x * tile_w, y * tile_h, tile_w, tile_h);
+	// Draw the tile over the border tile.
+	ctx.fillStyle = TILES[tile];
+	ctx.fillRect(x * tile_w + 1, y * tile_h - 1, tile_w - 1, tile_h - 1);
 };
 
 var drawStage = function (stage) {
