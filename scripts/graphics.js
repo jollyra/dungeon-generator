@@ -13,7 +13,7 @@ var drawTile = function (x, y, tile) {
 	var tile_w = 5;
 	var tile_h = 5;
 	var TILES = {
-		0: "#333300",  // Wall
+		0: "#333300",  // Earth
 		1: "#D6C2AD"   // Floor
 	};
 	ctx.fillStyle = TILES[tile];
@@ -33,13 +33,6 @@ var drawStage = function (stage) {
 };
 
 var Stage = {
-	_stage: [
-		[1, 1, 1, 1, 1],
-		[1, 0, 0, 0, 1],
-		[1, 0, 1, 0, 1],
-		[1, 0, 0, 0, 1],
-		[1, 1, 1, 1, 1]
-	],
 	x_max: function () {
 		if (this._stage && this._stage[0]) {
 			return this._stage[0].length;
