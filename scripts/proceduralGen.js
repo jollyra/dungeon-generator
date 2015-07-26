@@ -1,6 +1,7 @@
 var x_m = 50;
 var y_m = 50;
 
+// Create a 2d array of zeros.
 function emptyStage(x, y) {
 	var stage =  new Array(y);
 	for(i = 0; i < y; i++) {
