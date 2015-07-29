@@ -20,7 +20,7 @@ function randomRoom(stage) {
 		MIN_HEIGHT = 3,
 		h = _.random(MIN_HEIGHT, MAX_HEIGHT),
 		w = _.random(MIN_WIDTH, MAX_WIDTH),
-		x = _.random(3, stage.x_max - w - 1 - 3),
+		x = _.random(3, stage.x_max - w - 1 - 3),  // -1 for array bounds and -3 for padding
 		y = _.random(3, stage.y_max - h - 1 - 3);
 	var room = { h: h, w: w, x: x, y: y };
 	if (x + w >= x_m || y + h >= y_m) {
@@ -30,16 +30,15 @@ function randomRoom(stage) {
 }
 
 function checkCollisionsOnStage(stage, room) {
-	// Add padding to room to ensure 3 tiles between nodes.
 	var roomWithPadding = {};
-	roomWithPadding.x = room.x - 3;
+	roomWithPadding.x = room.x - 3;  // Add padding to room to ensure 3 tiles between nodes.
 	roomWithPadding.y = room.y - 3;
 	roomWithPadding.h = room.h + 6;
 	roomWithPadding.w = room.w + 6;
 	for(y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
 		for(x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
 			if(x >= x_m || y >= y_m) {
-				console.log(x,y);
+				throw new Error('Oi! That\'s out of bounds!', x, y);
 			}
 			if (stage.stage[y][x] !== 0) {
 				return true;
@@ -70,13 +69,64 @@ function placeRooms(stage, numTries) {
 			digRoom(stage, room);
 			rooms.push(room);
 		} else {
-			console.log('placeRooms: room: ', room, 'has collision.');
+			//console.log('placeRooms: room: ', room, 'has collision.');
 		}
 	}
 	return rooms;
 }
 
+function carvePassages(stage) {
+	// find some rock
+	// start cutting a passage there
+	// cut up, down, left, right at random
+	var x = 0,  // starting postions
+		y = 0;
+	// TODO
+}
+
+// (x, y) are the current position
+var pickaxe = {
+	digUp: function (stage, x, y) {
+		var x = x;
+		var	y = y - 1;
+		if (isRock(stage, x, y)) {
+			dig(stage, x, y);
+		}
+	},
+	digDown: function (stage, x, y) {
+		var x = x;
+		var	y = y + 1;
+		if (isRock(stage, x, y)) {
+			dig(stage, x, y);
+		}
+	},
+	digLeft: function (stage, x, y) {
+		var x = x - 1;
+		var	y = y;
+		if (isRock(stage, x, y)) {
+			dig(stage, x, y);
+		}
+	},
+	digRight: function (stage, x, y) {
+		var x = x + 1;
+		var	y = y;
+		if (isRock(stage, x, y)) {
+			dig(stage, x, y);
+		}
+	}
+}
+
+function isRock(stage, x, y) {
+	return stage.stage[y][x] === 0;
+}
+
+function dig(stage, x, y) {
+	stage.stage[y][x] = 1;
+}
+
+
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
 var rooms = placeRooms(stage, 100);
+carvePassages(stage);
 drawStage(stage);

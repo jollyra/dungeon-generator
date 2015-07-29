@@ -13,7 +13,7 @@ var drawTile = function (x, y, tile) {
 	var tile_w = 5;
 	var tile_h = 5;
 	var TILES = {
-		0: "#333300",  // Earth
+		0: "#333300",  // Rock
 		1: "#D6C2AD"   // Floor
 	};
 	// Draw a border around each tile.
