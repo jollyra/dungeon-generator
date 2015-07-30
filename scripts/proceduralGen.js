@@ -109,35 +109,44 @@ function carvePassages(stage, x0, y0) {
 // returns true if dig was successful
 var Dig = {
 	up: function (stage, pos) {
-		if (isRock(stage, pos.x, pos.y - 1)) {
-			dig(stage, pos.x, pos.y - 1);
+		if (dig(stage, pos.x, pos.y - 1)) {
 			pos.y = pos.y - 1;
 			return true;
+		} else {
+			return false;
 		}
-		return false;
 	},
 	down: function (stage, pos) {
-		if (isRock(stage, pos.x, pos.y + 1)) {
-			dig(stage, pos.x, pos.y + 1);
+		if (dig(stage, pos.x, pos.y + 1)) {
 			pos.y = pos.y + 1;
 			return true;
+		} else {
+			return false;
 		}
-		return false;
 	},
 	left: function (stage, pos) {
-		if (isRock(stage, pos.x - 1, pos.y)) {
-			dig(stage, pos.x - 1, pos.y);
+		if (dig(stage, pos.x - 1, pos.y)) {
 			pos.x = pos.x - 1;
 			return true;
+		} else {
+			return false;
 		}
-		return false;
 	},
 	right: function (stage, pos) {
-		if (isRock(stage, pos.x + 1, pos.y)) {
-			dig(stage, pos.x + 1, pos.y);
+		if (dig(stage, pos.x + 1, pos.y)) {
 			pos.x = pos.x + 1;
 			return true;
+		} else {
+			return false;
 		}
+	}
+}
+
+function dig(stage, x, y) {
+	if (isRock(stage, x, y)) {
+		stage.stage[y][x] = 1;
+		return true;
+	} else {
 		return false;
 	}
 }
@@ -147,12 +156,9 @@ function isRock(stage, x, y) {
 	// TODO: this should be on the stage.
 	if (stage.stage[y] === undefined || stage.stage[y][x] === undefined) {
 		return false;
+	} else {
+		return stage.stage[y][x] === 0;
 	}
-	return stage.stage[y][x] === 0;
-}
-
-function dig(stage, x, y) {
-	stage.stage[y][x] = 1;
 }
 
 
