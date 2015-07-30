@@ -79,9 +79,29 @@ function carvePassages(stage) {
 	// find some rock
 	// start cutting a passage there
 	// cut up, down, left, right at random
-	var x = 0,  // starting postions
-		y = 0;
-	// TODO
+	var x = 0;  // starting postions
+	var	y = 0;
+	var digHistory = [];  // For probability tuning.
+
+	function delve(stage, x, y) {
+		if (pickaxe.digDown(stage, x, y)) {
+			console.log('dig');
+			delve(stage, x, y + 1);
+		} else if (pickaxe.digRight(stage, x, y)) {
+			console.log('dig');
+			delve(stage, x + 1, y);
+		} else if (pickaxe.digUp(stage, x, y)) {
+			console.log('dig');
+			delve(stage, x, y - 0);
+		} else if (pickaxe.digLeft(stage, x, y)) {
+			console.log('dig');
+			delve(stage, x - 1, y);
+		} else {
+			console.log('Delved too greedily, and too deep.');
+		}
+	}
+	// Start delving.
+	delve(stage, x, y);
 }
 
 // (x, y) are the current position
@@ -91,32 +111,45 @@ var pickaxe = {
 		var	y = y - 1;
 		if (isRock(stage, x, y)) {
 			dig(stage, x, y);
+			return true;
 		}
+		return false;
 	},
 	digDown: function (stage, x, y) {
 		var x = x;
 		var	y = y + 1;
 		if (isRock(stage, x, y)) {
 			dig(stage, x, y);
+			return true;
 		}
+		return false;
 	},
 	digLeft: function (stage, x, y) {
 		var x = x - 1;
 		var	y = y;
 		if (isRock(stage, x, y)) {
 			dig(stage, x, y);
+			return true;
 		}
+		return false;
 	},
 	digRight: function (stage, x, y) {
 		var x = x + 1;
 		var	y = y;
 		if (isRock(stage, x, y)) {
 			dig(stage, x, y);
+			return true;
 		}
+		return false;
 	}
 }
 
 function isRock(stage, x, y) {
+	// Bounds check.
+	// TODO: this should be on the stage.
+	if (stage.stage[y] === undefined || stage.stage[y][x] === undefined) {
+		return false;
+	}
 	return stage.stage[y][x] === 0;
 }
 
@@ -127,6 +160,6 @@ function dig(stage, x, y) {
 
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
-var rooms = placeRooms(stage, 100);
+// var rooms = placeRooms(stage, 100);
 carvePassages(stage);
 drawStage(stage);
