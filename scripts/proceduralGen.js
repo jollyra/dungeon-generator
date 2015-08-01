@@ -191,4 +191,4 @@ var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
 var rooms = placeRooms(stage, 100);
 //carvePassages(stage, 0, 0);
-drawStage(stage);
+stage.update();

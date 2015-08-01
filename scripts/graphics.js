@@ -24,17 +24,6 @@ var drawTile = function (x, y, tile) {
 	ctx.fillRect(x * tile_w + 1, y * tile_h - 1, tile_w - 1, tile_h - 1);
 };
 
-var drawStage = function (stage) {
-	for(i = 0; i < stage.y_max; i++) {
-		for(k = 0; k < stage.x_max; k++) {
-			var x = k;
-			var y = i;
-			var tile = stage.stage[y][x];
-			drawTile(x, y, tile);
-		}
-	}
-};
-
 var Stage = {
 	x_max: function () {
 		if (this._stage && this._stage[0]) {
@@ -50,7 +39,16 @@ var Stage = {
 			throw new Error('Where\'s my GODDAMN array? _stage = ', this._stage);
 		}
 	},
-	// Optionally override with another stage.
+	update: function () {
+		for(i = 0; i < this.y_max; i++) {
+			for(k = 0; k < this.x_max; k++) {
+				var x = k;
+				var y = i;
+				var tile = this.stage[y][x];
+				drawTile(x, y, tile);
+			}
+		}
+	},
 	getStage: function (stage) {
 		if (stage) {
 			this._stage = stage;
@@ -58,7 +56,8 @@ var Stage = {
 		return {
 			stage: this._stage,
 			y_max: this.y_max(),
-			x_max: this.x_max()
+			x_max: this.x_max(),
+			update: this.update
 		};
 	}
 }
