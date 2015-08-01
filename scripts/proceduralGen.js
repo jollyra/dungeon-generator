@@ -14,16 +14,16 @@ function emptyStage(x, y) {
 }
 
 function randomRoom(stage) {
-	var MAX_WIDTH = 15,
+	var MAX_WIDTH = 15, // if odd will use the previous even number
 		MAX_HEIGHT = 15,
 		MIN_WIDTH = 3,
 		MIN_HEIGHT = 3,
-		h = _.random(MIN_HEIGHT, MAX_HEIGHT),
-		w = _.random(MIN_WIDTH, MAX_WIDTH),
-		x = _.random(3, stage.x_max - w - 1 - 3),  // -1 for array bounds and -3 for padding
-		y = _.random(3, stage.y_max - h - 1 - 3);
+		h = evenize(_.random(MIN_HEIGHT, MAX_HEIGHT)),
+		w = evenize(_.random(MIN_WIDTH, MAX_WIDTH)),
+		x = oddRng(1, stage.x_max - w - 1),  // -1 for array bounds and -3 for padding
+		y = oddRng(1, stage.y_max - h - 1);
 	var room = { h: h, w: w, x: x, y: y };
-	if (x + w >= x_m || y + h >= y_m) {
+	if (x + w >= x_m || y + h >= y_m) { // TODO: This should be on the stage object
 		throw new Error('Oi! That room is too big.', room);
 	}
 	return room;
@@ -31,10 +31,10 @@ function randomRoom(stage) {
 
 function checkCollisionsOnStage(stage, room) {
 	var roomWithPadding = {};
-	roomWithPadding.x = room.x - 3;  // Add padding to room to ensure 3 tiles between nodes.
-	roomWithPadding.y = room.y - 3;
-	roomWithPadding.h = room.h + 6;
-	roomWithPadding.w = room.w + 6;
+	roomWithPadding.x = room.x;  // Add padding to room to ensure 3 tiles between nodes.
+	roomWithPadding.y = room.y;
+	roomWithPadding.h = room.h;
+	roomWithPadding.w = room.w;
 	for(y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
 		for(x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
 			if(x >= x_m || y >= y_m) {
@@ -167,9 +167,28 @@ function oneIn(num, callback) {
 	}
 }
 
+function oddRng(min, max) {
+	var rn = _.random(min, max);
+	if (rn % 2 === 0) {
+		if (rn === max) {
+			rn = rn - 1;
+		} else if (rn === min) {
+			rn = rn + 1;
+		} else {
+			var adjustment = _.random(1,2) === 2 ? 1 : -1;
+			rn = rn + adjustment;
+		}
+	}
+	return rn;
+}
+
+function evenize(x) {
+	if (x === 0) { return x; }
+	return _.floor(x / 2) * 2
+}
 
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
-// var rooms = placeRooms(stage, 100);
-carvePassages(stage, 0, 0);
+var rooms = placeRooms(stage, 100);
+//carvePassages(stage, 0, 0);
 drawStage(stage);
