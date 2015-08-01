@@ -161,6 +161,12 @@ function isRock(stage, x, y) {
 	}
 }
 
+function oneIn(num, callback) {
+	if (_.random(1, num) % num === 0) {
+		return callback();
+	}
+}
+
 
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
