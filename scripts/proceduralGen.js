@@ -14,10 +14,10 @@ function emptyStage(x, y) {
 }
 
 function randomRoom(stage) {
-	var MAX_WIDTH = 15, // if odd will use the previous even number
-		MAX_HEIGHT = 15,
-		MIN_WIDTH = 3,
-		MIN_HEIGHT = 3,
+	var MAX_WIDTH = 19, // if odd will use the previous even number
+		MAX_HEIGHT = 19,
+		MIN_WIDTH = 5,
+		MIN_HEIGHT = 5,
 		h = evenize(_.random(MIN_HEIGHT, MAX_HEIGHT)),
 		w = evenize(_.random(MIN_WIDTH, MAX_WIDTH)),
 		x = oddRng(1, stage.x_max - w - 1),  // -1 for array bounds and -3 for padding
