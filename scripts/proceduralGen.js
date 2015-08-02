@@ -75,16 +75,39 @@ function placeRooms(stage, numTries) {
 	return rooms;
 }
 
-	// find some rock
-	// start cutting a passage there
-	// cut up, down, left, right at random
+// find some rock
+// start cutting a passage there
+// cut up, down, left, right at random
 function carvePassages(stage, x0, y0) {
 	var pos = {x: x0, y: x0};  // Current position initialized to the initial position.
 	dig(stage, pos.x, pos.y); // Excavate the starting tile.
 	var prevDig = null;
 	delve();
 
+	// To control how windy the passages are, we adjust how much we prefer to
+	// continue in a straight line vs choosing a new direction.
 	function delve() {
+		var rn = _.random(1, 4);
+		if (rn !== 4)  // 75% chance we just go straight
+			// continue in the same direction
+		} else {  // choose one of the directions at random
+			var rn = _.random(1,4);
+			switch(rn) {
+				case 1: function () {
+					// go down
+				};
+				case 2: function () {
+					// go right
+				};
+				case 3: function () {
+					// go up
+				};
+				case 4: function () {
+					// go left
+				};
+			}
+		}
+			/*
 		if (prevDig && prevDig(stage, pos)) {
 			delve();
 		} else if (Dig.down(stage, pos)) {
@@ -98,10 +121,9 @@ function carvePassages(stage, x0, y0) {
 			delve();
 		} else if (Dig.left(stage, pos)) {
 			prevDig = Dig.left;
-			delve();
-		} else {
 			console.log('Delved too greedily, and too deep.');
 		}
+		*/
 	}
 }
 
@@ -189,6 +211,6 @@ function evenize(x) {
 
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
-var rooms = placeRooms(stage, 100);
-//carvePassages(stage, 0, 0);
+//var rooms = placeRooms(stage, 100);
+carvePassages(stage, 0, 0);
 stage.update();
