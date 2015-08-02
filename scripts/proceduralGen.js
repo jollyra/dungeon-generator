@@ -81,49 +81,45 @@ function placeRooms(stage, numTries) {
 function carvePassages(stage, x0, y0) {
 	var pos = {x: x0, y: x0};  // Current position initialized to the initial position.
 	dig(stage, pos.x, pos.y); // Excavate the starting tile.
-	var prevDig = null;
+	var prevDig = Dig.down;  //TODO: should choose this randomly
 	delve();
 
 	// To control how windy the passages are, we adjust how much we prefer to
 	// continue in a straight line vs choosing a new direction.
+	// TODO: New idea for choosing direction:
+	// 		have a list of all directions
+	// 		filter list to only available directions
+	// 		choose one of the directions at random
+	// 		prefer same direction if it's available
 	function delve() {
 		var rn = _.random(1, 4);
-		if (rn !== 4)  // 75% chance we just go straight
-			// continue in the same direction
+		if (rn !== 4) {  // 75% chance we just go straight
+			prevDig(stage, pos);
+			delve();
 		} else {  // choose one of the directions at random
-			var rn = _.random(1,4);
-			switch(rn) {
-				case 1: function () {
-					// go down
+			switch(_.random(1,4)) {
+				case 1: return function () {
+					Dig.down(stage, pos);
+					prevDig = Dig.down;
+					return delve();
 				};
-				case 2: function () {
-					// go right
+				case 2: return function () {
+					Dig.right(stage, pos);
+					prevDig = Dig.right;
+					return delve();
 				};
-				case 3: function () {
-					// go up
+				case 3: return function () {
+					Dig.left(stage, pos);
+					prevDig = Dig.left;
+					return delve();
 				};
-				case 4: function () {
-					// go left
+				case 4: return function () {
+					Dig.up(stage, pos);
+					prevDig = Dig.up;
+					return delve();
 				};
 			}
 		}
-			/*
-		if (prevDig && prevDig(stage, pos)) {
-			delve();
-		} else if (Dig.down(stage, pos)) {
-			prevDig = Dig.down;
-			delve();
-		} else if (Dig.right(stage, pos)) {
-			prevDig = Dig.right;
-			delve();
-		} else if (Dig.up(stage, pos)) {
-			prevDig = Dig.up;
-			delve();
-		} else if (Dig.left(stage, pos)) {
-			prevDig = Dig.left;
-			console.log('Delved too greedily, and too deep.');
-		}
-		*/
 	}
 }
 
