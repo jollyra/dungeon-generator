@@ -117,6 +117,15 @@ function carvePassages(stage, x0, y0) {
 	}
 }
 
+// 1. take a starting position
+// 2. explore all adjacent tiles and push excavatable ones onto the stack
+// 		2.2 the order that tiles are pushed changes the shape of the passage
+// 3. pop off the stack and recurse back to 1.
+function carvePassagesStack(stage, x0, y0) {
+	var stack = [];
+
+}
+
 // pos(x, y) is the current position
 // returns true if dig was successful
 var Dig = {
