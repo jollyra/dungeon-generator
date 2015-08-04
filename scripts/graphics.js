@@ -4,6 +4,8 @@ var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT +
 var ctx = canvas.get(0).getContext("2d");
 canvas.appendTo('body');
 
+var ROCK = 0;
+var PASSAGE = 1
 
 // The stage is a 2d array of tiles.
 var y_max = 5;
@@ -43,7 +45,7 @@ var Stage = {
 		if (this.stage[y] === undefined || this.stage[y][x] === undefined) {
 			return false;
 		} else {
-			return this.stage[y][x] === 0;
+			return this.stage[y][x] === ROCK;
 		}
 	},
 	update: function () {
