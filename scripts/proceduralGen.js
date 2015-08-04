@@ -136,6 +136,14 @@ function evenize(x) {
 	return _.floor(x / 2) * 2
 }
 
+var colourGenerator = {
+	count: 0,
+	next: function () {
+		this.count = this.count + 1;
+		return this.count;
+	}
+}
+
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
 //var rooms = placeRooms(stage, 100);
