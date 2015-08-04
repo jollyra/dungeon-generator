@@ -88,25 +88,45 @@ function placeRooms(stage, numTries) {
 function carvePassage(stage, x0, y0) {
 	var stack = [],
 		x = x0,
-		y = y0;
+		y = y0,
+		colour = colourGenerator.next();
 	stack.push({x: x, y: y});
 	while (stack.length > 0) {
-		if (stage.isRock(x + 1, y)) {
+		if (stage.canDig(colour, x + 1, y)) {
 			stack.push({x: x + 1, y: y});
 		}
-		if (stage.isRock(x - 1, y)) {
+		if (stage.canDig(colour, x - 1, y)) {
 			stack.push({x: x - 1, y});
 		}
-		if (stage.isRock(x, y - 1)) {
+		if (stage.canDig(colour, x, y - 1)) {
 			stack.push({x: x, y: y - 1});
 		}
-		if (stage.isRock(x, y + 1)) {
+		if (stage.canDig(colour, x, y + 1)) {
 			stack.push({x: x, y: y + 1});
 		}
 		var tile = stack.pop();
 		x = tile.x;
 		y = tile.y;
 		stage.stage[y][x] = PASSAGE;
+	}
+
+	function canDig(colour, stage, x, y) {
+		if (stage.stage[y] === undefined || stage.stage[y][x] === undefined) {
+			return false;
+		}
+		if (stage[y][x] !== ROCK) {
+			return false
+		}
+		var adjacentSameColorTiles = 0;
+		var leftTile = stage.getTile(x - 1, y);
+		if (leftTile === colour) {
+			adjacentSameColorTiles = adjacentSameColorTiles + 1;
+		}
+		var rightTile = stage.getTile(x + 1, y);
+		if rightTile === colour) {
+			adjacentSameColorTiles = adjacentSameColorTiles + 1;
+		}
+		//TODO cont.
 	}
 }
 

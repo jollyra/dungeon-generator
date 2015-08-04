@@ -41,11 +41,11 @@ var Stage = {
 			throw new Error('Where\'s my GODDAMN array? _stage = ', this._stage);
 		}
 	},
-	isRock: function (x, y) {
+	getTile: function (x, y) {
 		if (this.stage[y] === undefined || this.stage[y][x] === undefined) {
 			return false;
 		} else {
-			return this.stage[y][x] === ROCK;
+			return this.stage[y][x];
 		}
 	},
 	update: function () {
