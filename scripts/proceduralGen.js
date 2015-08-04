@@ -72,61 +72,16 @@ function placeRooms(stage, numTries) {
 	return rooms;
 }
 
-function carvePassages(stage, x0, y0) {
-	var pos = {x: x0, y: x0};
-	dig(stage, pos.x, pos.y); // Excavate the starting tile.
-	var prevDig = dig.down;  //TODO: should choose this randomly
-	delve();
-
-	// To control how windy the passages are, we adjust how much we prefer to
-	// continue in a straight line vs choosing a new direction.
-	// TODO: New idea for choosing direction:
-	// 		have a list of all directions
-	// 		filter list to only available directions
-	// 		choose one of the directions at random
-	// 		prefer same direction if it's available
-	function delve() {
-		var rn = _.random(1, 4);
-		if (rn !== 4) {  // 75% chance we just go straight
-			prevDig(stage, pos);
-			delve();
-		} else {  // choose one of the directions at random
-			switch(_.random(1,4)) {
-				case 1: return function () {
-					dig.down(stage, pos);
-					prevDig = dig.down;
-					return delve();
-				};
-				case 2: return function () {
-					dig.right(stage, pos);
-					prevDig = dig.right;
-					return delve();
-				};
-				case 3: return function () {
-					dig.left(stage, pos);
-					prevDig = dig.left;
-					return delve();
-				};
-				case 4: return function () {
-					dig.up(stage, pos);
-					prevDig = dig.up;
-					return delve();
-				};
-			}
-		}
-	}
-}
-
 // 1. take a starting position
 // 2. explore all adjacent tiles and push excavatable ones onto the stack
 // 		2.2 the order that tiles are pushed changes the shape of the passage
-// 3. pop off the stack and recurse back to 1.
-function carvePassagesStack(stage, x0, y0) {
+// 3. pop off the stack and go back to 1.
+function carvePassage(stage, x0, y0) {
 	var stack = [],
 		x = x0,
 		y = y0;
-	stage.stage[y][x] = PASSAGE;
-	function delve(x, y) {
+	stack.push({x: x, y: y});
+	while (stack.length > 0) {
 		if (stage.isRock(x + 1, y)) {
 			stack.push({x: x + 1, y: y});
 		}
@@ -140,53 +95,9 @@ function carvePassagesStack(stage, x0, y0) {
 			stack.push({x: x, y: y + 1});
 		}
 		var tile = stack.pop();
-		stage.stage[tile.y][tile.x] = PASSAGE;
-	}
-}
-
-// pos(x, y) is the current position
-// returns true if dig was successful
-var dig = {
-	up: function (stage, pos) {
-		if (dig(stage, pos.x, pos.y - 1)) {
-			pos.y = pos.y - 1;
-			return true;
-		} else {
-			return false;
-		}
-	},
-	down: function (stage, pos) {
-		if (dig(stage, pos.x, pos.y + 1)) {
-			pos.y = pos.y + 1;
-			return true;
-		} else {
-			return false;
-		}
-	},
-	left: function (stage, pos) {
-		if (dig(stage, pos.x - 1, pos.y)) {
-			pos.x = pos.x - 1;
-			return true;
-		} else {
-			return false;
-		}
-	},
-	right: function (stage, pos) {
-		if (dig(stage, pos.x + 1, pos.y)) {
-			pos.x = pos.x + 1;
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
-function dig(stage, x, y) {
-	if (stage.isRock(x, y)) {
-		stage.stage[y][x] = 1;
-		return true;
-	} else {
-		return false;
+		x = tile.x;
+		y = tile.y;
+		stage.stage[y][x] = PASSAGE;
 	}
 }
 
@@ -219,5 +130,5 @@ function evenize(x) {
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
 //var rooms = placeRooms(stage, 100);
-carvePassages(stage, 0, 0);
+carvePassage(stage, 0, 0);
 stage.update();
