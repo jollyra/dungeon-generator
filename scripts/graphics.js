@@ -39,6 +39,13 @@ var Stage = {
 			throw new Error('Where\'s my GODDAMN array? _stage = ', this._stage);
 		}
 	},
+	isRock: function (x, y) {
+		if (this.stage[y] === undefined || this.stage[y][x] === undefined) {
+			return false;
+		} else {
+			return this.stage[y][x] === 0;
+		}
+	},
 	update: function () {
 		for(i = 0; i < this.y_max; i++) {
 			for(k = 0; k < this.x_max; k++) {
@@ -57,6 +64,7 @@ var Stage = {
 			stage: this._stage,
 			y_max: this.y_max(),
 			x_max: this.x_max(),
+			isRock: this.isRock,
 			update: this.update
 		};
 	}

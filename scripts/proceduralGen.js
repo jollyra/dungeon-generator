@@ -122,8 +122,12 @@ function carvePassages(stage, x0, y0) {
 // 		2.2 the order that tiles are pushed changes the shape of the passage
 // 3. pop off the stack and recurse back to 1.
 function carvePassagesStack(stage, x0, y0) {
-	var stack = [];
+	var stack = [],
+		x = x0,
+		y = y0;
+	if ( stage.isRock(x + 1, y)) {
 
+	}
 }
 
 // pos(x, y) is the current position
@@ -164,21 +168,11 @@ var Dig = {
 }
 
 function dig(stage, x, y) {
-	if (isRock(stage, x, y)) {
+	if (stage.isRock(x, y)) {
 		stage.stage[y][x] = 1;
 		return true;
 	} else {
 		return false;
-	}
-}
-
-function isRock(stage, x, y) {
-	// Bounds check.
-	// TODO: this should be on the stage.
-	if (stage.stage[y] === undefined || stage.stage[y][x] === undefined) {
-		return false;
-	} else {
-		return stage.stage[y][x] === 0;
 	}
 }
 
