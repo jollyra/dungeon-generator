@@ -72,10 +72,19 @@ function placeRooms(stage, numTries) {
 	return rooms;
 }
 
-// 1. take a starting position
-// 2. explore all adjacent tiles and push excavatable ones onto the stack
-// 		2.2 the order that tiles are pushed changes the shape of the passage
-// 3. pop off the stack and go back to 1.
+/**
+ * 1. take a starting position
+ * 2. explore all adjacent tiles and push excavatable ones onto the stack
+ *   2.2 the order that tiles are pushed changes the shape of the passage
+ * 3. pop off the stack and go back to 1.
+ */
+// TODO:
+//   passages must not touch anything
+//   prefer to dig in the same direction
+//   start new passage if there is space left on stage
+//   must choose between other directions randomly
+//
+//   SOLUTION: use colours to identify which region we can touch!
 function carvePassage(stage, x0, y0) {
 	var stack = [],
 		x = x0,
