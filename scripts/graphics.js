@@ -48,7 +48,7 @@ var Stage = {
 			return this.stage[y][x];
 		}
 	},
-	update: function () {
+	render: function () {
 		for(i = 0; i < this.y_max; i++) {
 			for(k = 0; k < this.x_max; k++) {
 				var x = k;
@@ -66,8 +66,8 @@ var Stage = {
 			stage: this._stage,
 			y_max: this.y_max(),
 			x_max: this.x_max(),
-			isRock: this.isRock,
-			update: this.update
+			getTile: this.getTile,
+			render: this.render
 		};
 	}
 }
