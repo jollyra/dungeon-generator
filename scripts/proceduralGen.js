@@ -1,8 +1,11 @@
+"use strict";
+
 var x_m = 50;
 var y_m = 50;
 
 function emptyStage(x, y) {
 	var stage =  new Array(y);
+  var i, j;
 	for(i = 0; i < y; i++) {
 		stage[i] = [];
 		for(j = 0; j < y; j++) {
@@ -25,6 +28,7 @@ var Rooms = {
 		this.tries = tries;
 	},
 	digRoom: function (stage, room) {
+    var y, x;
 		for(y = room.y; y <= room.y + room.h; y++) {
 			for(x = room.x; x <= room.x + room.w; x++) {
 				stage.stage[y][x] = 1;
@@ -33,10 +37,11 @@ var Rooms = {
 	},
 	checkRoomCollisions: function (stage, room) {
 		var roomWithPadding = {};
-		roomWithPadding.x = room.x;  // Add padding to room to ensure 3 tiles between nodes.
+		roomWithPadding.x = room.x;
 		roomWithPadding.y = room.y;
 		roomWithPadding.h = room.h;
 		roomWithPadding.w = room.w;
+    var y, x;
 		for(y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
 			for(x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
 				if(x >= x_m || y >= y_m) {
@@ -61,8 +66,8 @@ var Rooms = {
 		var room = { h: h, w: w, x: x, y: y };
 		if (x + w >= x_m || y + h >= y_m) { // TODO: This should be on the stage object
 			throw new Error('Oi! That room is too big.', room);
-		}
-		return room;
+    }
+    return room;
 	},
 	placeRoom: function () {
 		var room = this.randomRoom(this.stage);
@@ -77,7 +82,7 @@ var Rooms = {
 			this.tries = this.tries - 1;
 		}
 	}
-}
+};
 
 /**
  * 1. take a starting position
@@ -122,7 +127,7 @@ function carvePassage(stage, x0, y0) {
 			return false;
 		}
 		if (stage.stage[y][x] !== ROCK) {
-			return false
+			return false;
 		}
 		var adjacentSameColorTiles = 0;
 		var leftTile = stage.getTile(x - 1, y);
@@ -148,12 +153,6 @@ function carvePassage(stage, x0, y0) {
 	}
 }
 
-function oneIn(num, callback) {
-	if (_.random(1, num) % num === 0) {
-		return callback();
-	}
-}
-
 function oddRng(min, max) {
 	var rn = _.random(min, max);
 	if (rn % 2 === 0) {
@@ -171,7 +170,7 @@ function oddRng(min, max) {
 
 function evenize(x) {
 	if (x === 0) { return x; }
-	return _.floor(x / 2) * 2
+	return _.floor(x / 2) * 2;
 }
 
 var colourGenerator = {
@@ -180,7 +179,7 @@ var colourGenerator = {
 		this.count = this.count + 1;
 		return this.count;
 	}
-}
+};
 
 var arr = emptyStage(x_m, y_m);
 var stage = Stage.getStage(arr);
