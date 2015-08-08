@@ -1,3 +1,5 @@
+"use strict";
+
 var CANVAS_WIDTH = 480;
 var CANVAS_HEIGHT = 320;
 var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'></canvas>");
@@ -49,8 +51,8 @@ var Stage = {
 		}
 	},
 	render: function () {
-		for(i = 0; i < this.y_max; i++) {
-			for(k = 0; k < this.x_max; k++) {
+		for(var i = 0; i < this.y_max; i++) {
+			for(var k = 0; k < this.x_max; k++) {
 				var x = k;
 				var y = i;
 				var tile = this.stage[y][x];
@@ -70,5 +72,5 @@ var Stage = {
 			render: this.render
 		};
 	}
-}
+};
 
