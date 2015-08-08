@@ -114,7 +114,7 @@ function carvePassage(stage, x0, y0) {
 		if (stage.stage[y] === undefined || stage.stage[y][x] === undefined) {
 			return false;
 		}
-		if (stage.stage[y][x] !== ROCK) {
+		if (stage.stage[y][x] !== 0) {
 			return false;
 		}
 		var adjacentSameColorTiles = 0;
