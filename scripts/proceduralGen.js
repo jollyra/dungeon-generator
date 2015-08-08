@@ -3,18 +3,6 @@
 var x_m = 50;
 var y_m = 50;
 
-function emptyStage(x, y) {
-	var stage =  new Array(y);
-  var i, j;
-	for(i = 0; i < y; i++) {
-		stage[i] = [];
-		for(j = 0; j < y; j++) {
-			stage[i].push(0);
-		}
-	}
-	return stage;
-}
-
 /* Tries a certain number of times to place random sized rooms within the
  * constraints of the supplied stage. Rooms must not overlap.
  */
@@ -181,15 +169,14 @@ var colourGenerator = {
 	}
 };
 
-var arr = emptyStage(x_m, y_m);
-var stage = Stage.getStage(arr);
-Rooms.init(stage, 20);
-//carvePassage(stage, 0, 0);
+var world = worldConstructor(x_m, y_m);
+Rooms.init(world, 20);
+//carvePassage(world, 0, 0);
 
 function timeout() {
     setTimeout(function () {
 		update();
-		stage.render();
+		world.render();
         timeout();
     }, 75);
 }
