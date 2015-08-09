@@ -77,12 +77,6 @@ var roomBuilderConstructor = function (world, attempts) {
 };
 
 
-/**
- * 1. take a starting position
- * 2. explore all adjacent tiles and push excavatable ones onto the stack
- *   2.2 the order that tiles are pushed changes the shape of the passage
- * 3. pop off the stack and go back to 1.
- */
 // TODO:
 //   passages must not touch anything
 //   prefer to dig in the same direction
@@ -90,34 +84,33 @@ var roomBuilderConstructor = function (world, attempts) {
 //   must choose between other directions randomly
 //
 //   SOLUTION: use colours to identify which region we can touch!
-
 function passageCarverConstructor(world, x0, y0) {
   'use strict';
+  var stack = [];
+  stack.push({x: x0, y: y0});
 
   var passageCarver = {
-    carvePassage: function () {
-      var stack = [],
-        x = this.x0,
-        y = this.y0,
-        colour = colourGenerator.next();
-      stack.push({x: x, y: y});
-      while (stack.length > 0) {
-        if (canDig(colour, x + 1, y)) {
-          stack.push({x: x + 1, y: y});
+    colour: colourGenerator.next(),
+
+    delveDeeper: function () {
+      if (this.stack.length > 0) {
+        var tile = this.stack.pop();
+        var x = tile.x;
+        var y = tile.y;
+        this.world.stage[tile.y][tile.x] = this.colour;
+
+        if (this.canDig(this.colour, x + 1, y)) {
+          this.stack.push({x: x + 1, y: y});
         }
-        if (canDig(colour, x - 1, y)) {
-          stack.push({x: x - 1, y});
+        if (this.canDig(this.colour, x - 1, y)) {
+          this.stack.push({x: x - 1, y: y});
         }
-        if (canDig(colour, x, y - 1)) {
-          stack.push({x: x, y: y - 1});
+        if (this.canDig(this.colour, x, y - 1)) {
+          this.stack.push({x: x, y: y - 1});
         }
-        if (canDig(colour, x, y + 1)) {
-          stack.push({x: x, y: y + 1});
+        if (this.canDig(this.colour, x, y + 1)) {
+          this.stack.push({x: x, y: y + 1});
         }
-        var tile = stack.pop();
-        x = tile.x;
-        y = tile.y;
-        this.world.stage[y][x] = colour;
       }
     },
 
@@ -152,7 +145,7 @@ function passageCarverConstructor(world, x0, y0) {
     },
 
     update: function () {
-      // TODO
+      this.delveDeeper();
     }
   };
 
@@ -160,6 +153,7 @@ function passageCarverConstructor(world, x0, y0) {
   newPassageCarver.world = world;
   newPassageCarver.x0 = x0;
   newPassageCarver.y0 = y0;
+  newPassageCarver.stack = stack;
   return newPassageCarver;
 }
 
@@ -199,10 +193,10 @@ var passageCarver = passageCarverConstructor(world, 0, 0);
 function timeout() {
   'use strict';
     setTimeout(function () {
-    //roomBuilder.update();
+    roomBuilder.update();
     passageCarver.update();
 		world.render();
         timeout();
-    }, 100);
+    }, 25);
 }
 timeout();
