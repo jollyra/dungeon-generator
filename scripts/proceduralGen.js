@@ -53,13 +53,18 @@ var roomBuilderConstructor = function (world, attempts) {
       if (this.checkRoomCollisions(this.world, room) === false) {
         this.digRoom(this.world, room);
         this.rooms.push(room);
+        return true;
       }
+      return false;
     },
 
     update: function () {
-      if (this.attempts > 0) {
-        this.placeRoom();
+      while (this.attempts > 0) {
         this.attempts = this.attempts - 1;
+        var wasSuccessful = this.placeRoom();
+        if (wasSuccessful === true) {
+          return;
+        }
       }
     }
   };
@@ -179,7 +184,7 @@ function timeout() {
 		update();
 		world.render();
         timeout();
-    }, 75);
+    }, 100);
 }
 timeout();
 
