@@ -90,61 +90,79 @@ var roomBuilderConstructor = function (world, attempts) {
 //   must choose between other directions randomly
 //
 //   SOLUTION: use colours to identify which region we can touch!
-function carvePassage(world, x0, y0) {
-	var stack = [],
-		x = x0,
-		y = y0,
-		colour = colourGenerator.next();
-	stack.push({x: x, y: y});
-	while (stack.length > 0) {
-		if (canDig(colour, world, x + 1, y)) {
-			stack.push({x: x + 1, y: y});
-		}
-		if (canDig(colour, world, x - 1, y)) {
-			stack.push({x: x - 1, y});
-		}
-		if (canDig(colour, world, x, y - 1)) {
-			stack.push({x: x, y: y - 1});
-		}
-		if (canDig(colour, world, x, y + 1)) {
-			stack.push({x: x, y: y + 1});
-		}
-		var tile = stack.pop();
-		x = tile.x;
-		y = tile.y;
-		world.stage[y][x] = colour;
-	}
 
-	function canDig(colour, world, x, y) {
-		if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
-			return false;
-		}
-		if (world.stage[y][x] !== 0) {
-			return false;
-		}
-		var adjacentSameColorTiles = 0;
-		var leftTile = world.getTile(x - 1, y);
-		if (leftTile === colour) {
-			adjacentSameColorTiles = adjacentSameColorTiles + 1;
-		}
-		var rightTile = world.getTile(x + 1, y);
-		if (rightTile === colour) {
-			adjacentSameColorTiles = adjacentSameColorTiles + 1;
-		}
-		var downTile = world.getTile(x, y + 1);
-		if (downTile === colour) {
-			adjacentSameColorTiles = adjacentSameColorTiles + 1;
-		}
-		var upTile = world.getTile(x, y - 1);
-		if (upTile === colour) {
-			adjacentSameColorTiles = adjacentSameColorTiles + 1;
-		}
-		if (adjacentSameColorTiles > 1) {
-			return false;
-		}
-		return true;
-	}
+function passageCarverConstructor(world, x0, y0) {
+  'use strict';
+
+  var passageCarver = {
+    carvePassage: function () {
+      var stack = [],
+        x = this.x0,
+        y = this.y0,
+        colour = colourGenerator.next();
+      stack.push({x: x, y: y});
+      while (stack.length > 0) {
+        if (canDig(colour, x + 1, y)) {
+          stack.push({x: x + 1, y: y});
+        }
+        if (canDig(colour, x - 1, y)) {
+          stack.push({x: x - 1, y});
+        }
+        if (canDig(colour, x, y - 1)) {
+          stack.push({x: x, y: y - 1});
+        }
+        if (canDig(colour, x, y + 1)) {
+          stack.push({x: x, y: y + 1});
+        }
+        var tile = stack.pop();
+        x = tile.x;
+        y = tile.y;
+        this.world.stage[y][x] = colour;
+      }
+    },
+
+    canDig: function (colour, x, y) {
+      if (this.world.stage[y] === undefined || this.world.stage[y][x] === undefined) {
+        return false;
+      }
+      if (this.world.stage[y][x] !== 0) {
+        return false;
+      }
+      var adjacentSameColorTiles = 0;
+      var leftTile = this.world.getTile(x - 1, y);
+      if (leftTile === colour) {
+        adjacentSameColorTiles = adjacentSameColorTiles + 1;
+      }
+      var rightTile = this.world.getTile(x + 1, y);
+      if (rightTile === colour) {
+        adjacentSameColorTiles = adjacentSameColorTiles + 1;
+      }
+      var downTile = this.world.getTile(x, y + 1);
+      if (downTile === colour) {
+        adjacentSameColorTiles = adjacentSameColorTiles + 1;
+      }
+      var upTile = this.world.getTile(x, y - 1);
+      if (upTile === colour) {
+        adjacentSameColorTiles = adjacentSameColorTiles + 1;
+      }
+      if (adjacentSameColorTiles > 1) {
+        return false;
+      }
+      return true;
+    },
+
+    update: function () {
+      // TODO
+    }
+  };
+
+  var newPassageCarver = Object.create(passageCarver);
+  newPassageCarver.world = world;
+  newPassageCarver.x0 = x0;
+  newPassageCarver.y0 = y0;
+  return newPassageCarver;
 }
+
 
 function oddRng(min, max) {
 	var rn = _.random(min, max);
@@ -176,18 +194,15 @@ var colourGenerator = {
 
 var world = worldConstructor(50, 50);
 var roomBuilder = roomBuilderConstructor(world, 20);
-//carvePassage(world, 0, 0);
+var passageCarver = passageCarverConstructor(world, 0, 0);
 
 function timeout() {
   'use strict';
     setTimeout(function () {
-		update();
+    //roomBuilder.update();
+    passageCarver.update();
 		world.render();
         timeout();
     }, 100);
 }
 timeout();
-
-function update() {
-	roomBuilder.update();
-}
