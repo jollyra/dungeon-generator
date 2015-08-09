@@ -1,76 +1,76 @@
-"use strict";
-
-var x_m = 50;
-var y_m = 50;
-
 /* Tries a certain number of times to place random sized rooms within the
  * constraints of the supplied stage. Rooms must not overlap.
  */
-var Rooms = {
-	rooms: [],
-	tries: 0,
-	stage: null,
+var roomBuilderConstructor = function (world, attempts) {
+  "use strict";
 
-	init: function (stage, tries) {
-		this.stage = stage;
-		this.tries = tries;
-	},
-	digRoom: function (stage, room) {
-    var y, x;
-		for(y = room.y; y <= room.y + room.h; y++) {
-			for(x = room.x; x <= room.x + room.w; x++) {
-				stage.stage[y][x] = 1;
-			}
-		}
-	},
-	checkRoomCollisions: function (stage, room) {
-		var roomWithPadding = {};
-		roomWithPadding.x = room.x;
-		roomWithPadding.y = room.y;
-		roomWithPadding.h = room.h;
-		roomWithPadding.w = room.w;
-    var y, x;
-		for(y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
-			for(x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
-				if(x >= x_m || y >= y_m) {
-					throw new Error('Oi! That\'s out of bounds!', x, y);
-				}
-				if (stage.stage[y][x] !== 0) {
-					return true;
-				}
-			}
-		}
-		return false;
-	},
-	randomRoom: function (stage) {
-		var MAX_WIDTH = 19, // if odd will use the previous even number
-			MAX_HEIGHT = 19,
-			MIN_WIDTH = 5,
-			MIN_HEIGHT = 5,
-			h = evenize(_.random(MIN_HEIGHT, MAX_HEIGHT)),
-			w = evenize(_.random(MIN_WIDTH, MAX_WIDTH)),
-			x = oddRng(1, stage.x_max - w - 1),
-			y = oddRng(1, stage.y_max - h - 1);
-		var room = { h: h, w: w, x: x, y: y };
-		if (x + w >= x_m || y + h >= y_m) { // TODO: This should be on the stage object
-			throw new Error('Oi! That room is too big.', room);
+  var roomBuilder = {
+    digRoom: function (world, room) {
+      for(var y = room.y; y <= room.y + room.h; y++) {
+        for(var x = room.x; x <= room.x + room.w; x++) {
+          world.stage[y][x] = 1;
+        }
+      }
+    },
+
+    checkRoomCollisions: function (world, room) {
+      var roomWithPadding = {};
+      roomWithPadding.x = room.x;
+      roomWithPadding.y = room.y;
+      roomWithPadding.h = room.h;
+      roomWithPadding.w = room.w;
+      for(var y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
+        for(var x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
+          if(x >= world.x_max || y >= world.y_max) {
+            throw new Error('Oi! That\'s out of bounds!', x, y);
+          }
+          if (world.stage[y][x] !== 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+
+    randomRoom: function (world) {
+      var MAX_WIDTH = 19; // if odd will use the previous even number
+      var MAX_HEIGHT = 19;
+      var MIN_WIDTH = 5;
+      var MIN_HEIGHT = 5;
+      var h = evenize(_.random(MIN_HEIGHT, MAX_HEIGHT));
+      var w = evenize(_.random(MIN_WIDTH, MAX_WIDTH));
+      var x = oddRng(1, world.x_max - w - 1);
+      var y = oddRng(1, world.y_max - h - 1);
+      var room = { h: h, w: w, x: x, y: y };
+      if (x + w >= world.x_max || y + h >= world.y_max) {
+        throw new Error('Oi! That room is too big.', room);
+      }
+      return room;
+    },
+
+    placeRoom: function () {
+      var room = this.randomRoom(this.world);
+      if (this.checkRoomCollisions(this.world, room) === false) {
+        this.digRoom(this.world, room);
+        this.rooms.push(room);
+      }
+    },
+
+    update: function () {
+      if (this.attempts > 0) {
+        this.placeRoom();
+        this.attempts = this.attempts - 1;
+      }
     }
-    return room;
-	},
-	placeRoom: function () {
-		var room = this.randomRoom(this.stage);
-		if (this.checkRoomCollisions(this.stage, room) === false) {
-			this.digRoom(this.stage, room);
-			this.rooms.push(room);
-		}
-	},
-	update: function () {
-		if (this.tries > 0) {
-			this.placeRoom();
-			this.tries = this.tries - 1;
-		}
-	}
+  };
+
+  var newRoomBuilder = Object.create(roomBuilder);
+  newRoomBuilder.world = world;
+  newRoomBuilder.attempts = attempts;
+  newRoomBuilder.rooms = [];
+  return newRoomBuilder;
 };
+
 
 /**
  * 1. take a starting position
@@ -81,56 +81,56 @@ var Rooms = {
 // TODO:
 //   passages must not touch anything
 //   prefer to dig in the same direction
-//   start new passage if there is space left on stage
+//   start new passage if there is space left on world
 //   must choose between other directions randomly
 //
 //   SOLUTION: use colours to identify which region we can touch!
-function carvePassage(stage, x0, y0) {
+function carvePassage(world, x0, y0) {
 	var stack = [],
 		x = x0,
 		y = y0,
 		colour = colourGenerator.next();
 	stack.push({x: x, y: y});
 	while (stack.length > 0) {
-		if (canDig(colour, stage, x + 1, y)) {
+		if (canDig(colour, world, x + 1, y)) {
 			stack.push({x: x + 1, y: y});
 		}
-		if (canDig(colour, stage, x - 1, y)) {
+		if (canDig(colour, world, x - 1, y)) {
 			stack.push({x: x - 1, y});
 		}
-		if (canDig(colour, stage, x, y - 1)) {
+		if (canDig(colour, world, x, y - 1)) {
 			stack.push({x: x, y: y - 1});
 		}
-		if (canDig(colour, stage, x, y + 1)) {
+		if (canDig(colour, world, x, y + 1)) {
 			stack.push({x: x, y: y + 1});
 		}
 		var tile = stack.pop();
 		x = tile.x;
 		y = tile.y;
-		stage.stage[y][x] = colour;
+		world.stage[y][x] = colour;
 	}
 
-	function canDig(colour, stage, x, y) {
-		if (stage.stage[y] === undefined || stage.stage[y][x] === undefined) {
+	function canDig(colour, world, x, y) {
+		if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
 			return false;
 		}
-		if (stage.stage[y][x] !== 0) {
+		if (world.stage[y][x] !== 0) {
 			return false;
 		}
 		var adjacentSameColorTiles = 0;
-		var leftTile = stage.getTile(x - 1, y);
+		var leftTile = world.getTile(x - 1, y);
 		if (leftTile === colour) {
 			adjacentSameColorTiles = adjacentSameColorTiles + 1;
 		}
-		var rightTile = stage.getTile(x + 1, y);
+		var rightTile = world.getTile(x + 1, y);
 		if (rightTile === colour) {
 			adjacentSameColorTiles = adjacentSameColorTiles + 1;
 		}
-		var downTile = stage.getTile(x, y + 1);
+		var downTile = world.getTile(x, y + 1);
 		if (downTile === colour) {
 			adjacentSameColorTiles = adjacentSameColorTiles + 1;
 		}
-		var upTile = stage.getTile(x, y - 1);
+		var upTile = world.getTile(x, y - 1);
 		if (upTile === colour) {
 			adjacentSameColorTiles = adjacentSameColorTiles + 1;
 		}
@@ -169,11 +169,12 @@ var colourGenerator = {
 	}
 };
 
-var world = worldConstructor(x_m, y_m);
-Rooms.init(world, 20);
+var world = worldConstructor(50, 50);
+var roomBuilder = roomBuilderConstructor(world, 20);
 //carvePassage(world, 0, 0);
 
 function timeout() {
+  'use strict';
     setTimeout(function () {
 		update();
 		world.render();
@@ -183,5 +184,5 @@ function timeout() {
 timeout();
 
 function update() {
-	Rooms.update();
+	roomBuilder.update();
 }

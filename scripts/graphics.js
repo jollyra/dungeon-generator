@@ -15,7 +15,6 @@ var initCanvas = function () {
 
 var graphicsConstructor = function () {
   "use strict";
-
   var graphics = {
     drawTile: function (x, y, colour) {
       var tile_w = 5;
