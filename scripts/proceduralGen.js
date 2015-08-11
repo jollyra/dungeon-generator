@@ -147,6 +147,10 @@ function passageCarverConstructor(world, x0, y0) {
       return true;
     },
 
+    startNextPassage: function () {
+      // Finds a carvable region and starts a passage.
+    },
+
     update: function () {
       while(this.delveDeeper()) {}
     }
