@@ -91,6 +91,7 @@ function passageCarverConstructor(world, x0, y0) {
 
   var passageCarver = {
     colour: colourGenerator.next(),
+    prevDirection = null,
 
     delveDeeper: function () {
       if (this.stack.length > 0) {
@@ -102,9 +103,14 @@ function passageCarverConstructor(world, x0, y0) {
         }
         this.world.stage[tile.y][tile.x] = this.colour;
 
-        if (this.canDig(this.colour, x + 1, y)) {
-          this.stack.push({x: x + 1, y: y});
+        function CheckThenDigLeft() {
+          if (this.canDig(this.colour, x + 1, y)) {
+            this.stack.push({x: x + 1, y: y});
+            return true;
+          }
+          return false;
         }
+
         if (this.canDig(this.colour, x - 1, y)) {
           this.stack.push({x: x - 1, y: y});
         }
