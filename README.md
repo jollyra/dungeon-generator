@@ -9,3 +9,7 @@ Try it! http://jollyra.github.io/dungeon-generator
 3. Connect all nodes together creating a spanning tree
 4. Add back some connectors depending on desired connectedness
 4. Trim the passages back making them sparse
+
+Useful References:
+- http://www.astrolog.org/labyrnth/algrithm.htm
+- http://www.jamisbuck.org/mazes/
