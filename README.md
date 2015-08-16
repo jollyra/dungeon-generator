@@ -4,7 +4,7 @@ An implementation of Bob Nystrom's [dungeon generation algorithm](http://journal
 
 Try it! http://jollyra.github.io/dungeon-generator
 
-1. Randomly place some rooms
+1. Randomly try to place rooms
 2. Fill the remaining space with a maze
 3. Connect all nodes together creating a spanning tree
 4. Add back some connectors depending on desired connectedness
