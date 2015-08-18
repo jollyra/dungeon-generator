@@ -66,7 +66,22 @@ var roomBuilderConstructor = function (world, attempts) {
           return;
         }
       }
-    }
+    },
+
+    run: function () {
+      var that = this;
+      var done;
+      function timeout() {
+        setTimeout(function () {
+          that.update();
+          that.world.render();
+          if (!done) {
+            timeout();
+          }
+        }, 0);
+      }
+      timeout();
+      }
   };
 
   var newRoomBuilder = Object.create(roomBuilder);
@@ -100,6 +115,8 @@ function passageCarver(world, x0, y0) {
       _.each(_.shuffle(directions), function (direction) {
         direction(x, y);
       });
+    } else {  // Send a signal to the game loop to stop
+      return false;
     }
   }
 
@@ -166,11 +183,14 @@ function passageCarver(world, x0, y0) {
   }
 
   function timeout() {
-      setTimeout(function () {
-        delveDeeper();
-        world.render();
+    var done;
+    setTimeout(function () {
+      delveDeeper();
+      world.render();
+      if (!done) {
         timeout();
-      }, 1);
+      }
+    }, 1);
   }
   timeout();
 }
@@ -206,15 +226,5 @@ var colourGenerator = {
 
 var world = worldConstructor(50, 50);
 var roomBuilder = roomBuilderConstructor(world, 100);
-
-function timeout() {
-  'use strict';
-    setTimeout(function () {
-      roomBuilder.update();
-      world.render();
-      timeout();
-    }, 1);
-}
-timeout();
-
+roomBuilder.run();
 passageCarver(world, 0, 0);
