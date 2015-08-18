@@ -33,10 +33,10 @@ var roomBuilderConstructor = function (world, attempts) {
     },
 
     randomRoom: function (world) {
-      var MAX_WIDTH = 19; // if odd will use the previous even number
-      var MAX_HEIGHT = 19;
-      var MIN_WIDTH = 5;
-      var MIN_HEIGHT = 5;
+      var MAX_WIDTH = 15; // if odd will use the previous even number
+      var MAX_HEIGHT = 15;
+      var MIN_WIDTH = 3;
+      var MIN_HEIGHT = 3;
       var h = evenize(_.random(MIN_HEIGHT, MAX_HEIGHT));
       var w = evenize(_.random(MIN_WIDTH, MAX_WIDTH));
       var x = oddRng(1, world.x_max - w - 1);
@@ -151,14 +151,29 @@ function passageCarver(world, x0, y0) {
     if (upTile === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    if (adjacentSameColorTiles > 1) {
+    var tile = world.getTile(x - 1, y - 1);
+    if (tile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    var tile = world.getTile(x - 1, y + 1);
+    if (tile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    var tile = world.getTile(x + 1, y + 1);
+    if (tile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    var tile = world.getTile(x + 1, y - 1);
+    if (tile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    if (adjacentSameColorTiles > 2) {
       return false;
     }
     return true;
   }
 
   function timeout() {
-    'use strict';
       setTimeout(function () {
         delveDeeper();
         world.render();
@@ -198,7 +213,7 @@ var colourGenerator = {
 };
 
 var world = worldConstructor(50, 50);
-var roomBuilder = roomBuilderConstructor(world, 20);
+var roomBuilder = roomBuilderConstructor(world, 100);
 
 function timeout() {
   'use strict';
