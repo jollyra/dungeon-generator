@@ -76,98 +76,91 @@ var roomBuilderConstructor = function (world, attempts) {
   return newRoomBuilder;
 };
 
-
-// TODO:
-//   passages must not touch anything
-//   prefer to dig in the same direction
-//   start new passage if there is space left on world
-//   must choose between other directions randomly
-//
-//   SOLUTION: use colours to identify which region we can touch!
-function passageCarverConstructor(world, x0, y0) {
+function passageCarver(world, x0, y0) {
   'use strict';
   var stack = [];
   stack.push({x: x0, y: y0});
+  var colour = colourGenerator.next();
 
-  var passageCarver = {
-    colour: colourGenerator.next(),
-    prevDirection = null,
-
-    delveDeeper: function () {
-      if (this.stack.length > 0) {
-        var tile = this.stack.pop();
-        var x = tile.x;
-        var y = tile.y;
-        if (this.canDig(this.colour, x, y) === false) {
-          return false;
-        }
-        this.world.stage[tile.y][tile.x] = this.colour;
-
-        function CheckThenDigLeft() {
-          if (this.canDig(this.colour, x + 1, y)) {
-            this.stack.push({x: x + 1, y: y});
-            return true;
-          }
-          return false;
-        }
-
-        if (this.canDig(this.colour, x - 1, y)) {
-          this.stack.push({x: x - 1, y: y});
-        }
-        if (this.canDig(this.colour, x, y - 1)) {
-          this.stack.push({x: x, y: y - 1});
-        }
-        if (this.canDig(this.colour, x, y + 1)) {
-          this.stack.push({x: x, y: y + 1});
-        }
-      }
-    },
-
-    canDig: function (colour, x, y) {
-      if (this.world.stage[y] === undefined || this.world.stage[y][x] === undefined) {
+  function delveDeeper() {
+    if (stack.length > 0) {
+      var tile = stack.pop();
+      var x = tile.x;
+      var y = tile.y;
+      if (canDig(colour, x, y) === false) {
         return false;
       }
-      if (this.world.stage[y][x] !== 0) {
-        return false;
-      }
-      var adjacentSameColorTiles = 0;
-      var leftTile = this.world.getTile(x - 1, y);
-      if (leftTile === colour) {
-        adjacentSameColorTiles = adjacentSameColorTiles + 1;
-      }
-      var rightTile = this.world.getTile(x + 1, y);
-      if (rightTile === colour) {
-        adjacentSameColorTiles = adjacentSameColorTiles + 1;
-      }
-      var downTile = this.world.getTile(x, y + 1);
-      if (downTile === colour) {
-        adjacentSameColorTiles = adjacentSameColorTiles + 1;
-      }
-      var upTile = this.world.getTile(x, y - 1);
-      if (upTile === colour) {
-        adjacentSameColorTiles = adjacentSameColorTiles + 1;
-      }
-      if (adjacentSameColorTiles > 1) {
-        return false;
-      }
-      return true;
-    },
-
-    startNextPassage: function () {
-      // Finds a carvable region and starts a passage.
-    },
-
-    update: function () {
-      while(this.delveDeeper()) {}
+      world.stage[tile.y][tile.x] = colour;
+      pushRight(x, y);
+      pushLeft(x, y);
+      pushUp(x, y);
+      pushDown(x, y);
     }
-  };
+  }
 
-  var newPassageCarver = Object.create(passageCarver);
-  newPassageCarver.world = world;
-  newPassageCarver.x0 = x0;
-  newPassageCarver.y0 = y0;
-  newPassageCarver.stack = stack;
-  return newPassageCarver;
+  function pushRight(x, y) {
+    if (canDig(colour, x + 1, y)) {
+      stack.push({x: x + 1, y: y});
+    }
+  }
+
+  function pushLeft(x, y) {
+    if (canDig(colour, x - 1, y)) {
+      stack.push({x: x - 1, y: y});
+    }
+  }
+
+  function pushUp(x, y) {
+    if (canDig(colour, x, y - 1)) {
+      stack.push({x: x, y: y - 1});
+    }
+  }
+
+  function pushDown(x, y) {
+    if (canDig(colour, x, y + 1)) {
+      stack.push({x: x, y: y + 1});
+    }
+  }
+
+  function canDig(colour, x, y) {
+    if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
+      return false;
+    }
+    if (world.stage[y][x] !== 0) {
+      return false;
+    }
+    var adjacentSameColorTiles = 0;
+    var leftTile = world.getTile(x - 1, y);
+    if (leftTile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    var rightTile = world.getTile(x + 1, y);
+    if (rightTile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    var downTile = world.getTile(x, y + 1);
+    if (downTile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    var upTile = world.getTile(x, y - 1);
+    if (upTile === colour) {
+      adjacentSameColorTiles = adjacentSameColorTiles + 1;
+    }
+    if (adjacentSameColorTiles > 1) {
+      return false;
+    }
+    return true;
+  }
+
+  function timeout() {
+    'use strict';
+      setTimeout(function () {
+        delveDeeper();
+        world.render();
+        timeout();
+      }, 1);
+  }
+  timeout();
 }
 
 
@@ -201,15 +194,15 @@ var colourGenerator = {
 
 var world = worldConstructor(50, 50);
 var roomBuilder = roomBuilderConstructor(world, 20);
-var passageCarver = passageCarverConstructor(world, 0, 0);
 
 function timeout() {
   'use strict';
     setTimeout(function () {
-    roomBuilder.update();
-    passageCarver.update();
-		world.render();
-        timeout();
-    }, 25);
+      roomBuilder.update();
+      world.render();
+      timeout();
+    }, 1);
 }
 timeout();
+
+passageCarver(world, 0, 0);
