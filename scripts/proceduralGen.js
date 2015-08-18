@@ -135,36 +135,28 @@ function passageCarver(world, x0, y0) {
       return false;
     }
     var adjacentSameColorTiles = 0;
-    var leftTile = world.getTile(x - 1, y);
-    if (leftTile === colour) {
+    if (world.getTile(x - 1, y) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    var rightTile = world.getTile(x + 1, y);
-    if (rightTile === colour) {
+    if (world.getTile(x + 1, y) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    var downTile = world.getTile(x, y + 1);
-    if (downTile === colour) {
+    if (world.getTile(x, y + 1) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    var upTile = world.getTile(x, y - 1);
-    if (upTile === colour) {
+    if (world.getTile(x, y - 1) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    var tile = world.getTile(x - 1, y - 1);
-    if (tile === colour) {
+    if (world.getTile(x - 1, y - 1) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    var tile = world.getTile(x - 1, y + 1);
-    if (tile === colour) {
+    if (world.getTile(x - 1, y + 1) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    var tile = world.getTile(x + 1, y + 1);
-    if (tile === colour) {
+    if (world.getTile(x + 1, y + 1) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
-    var tile = world.getTile(x + 1, y - 1);
-    if (tile === colour) {
+    if (world.getTile(x + 1, y - 1) === colour) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
     }
     if (adjacentSameColorTiles > 2) {
