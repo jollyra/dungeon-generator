@@ -91,10 +91,15 @@ function passageCarver(world, x0, y0) {
         return false;
       }
       world.stage[tile.y][tile.x] = colour;
-      pushRight(x, y);
-      pushLeft(x, y);
-      pushUp(x, y);
-      pushDown(x, y);
+      var directions = [
+        pushRight,
+        pushLeft,
+        pushUp,
+        pushDown
+      ];
+      _.each(_.shuffle(directions), function (direction) {
+        direction(x, y);
+      });
     }
   }
 
