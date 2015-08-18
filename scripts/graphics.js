@@ -21,13 +21,21 @@ var graphicsConstructor = function () {
       var tile_h = 5;
       var TILES = {
         0: "#333300",  // Rock
-        1: "#D6C2AD"   // Floor
+        1: "#c8cb77",
+        2: "#1b85b8",
+        3: "#559e83",
+        4: "#ae5a41",
+        5: "#c3cb71"
       };
       // Draw a border around each tile.
       this.ctx.fillStyle = "#000000";
       this.ctx.fillRect(x * tile_w, y * tile_h, tile_w, tile_h);
       // Draw the tile over the border tile.
-      this.ctx.fillStyle = TILES[colour];
+      if (colour === 0) {
+        this.ctx.fillStyle = TILES[colour];
+      } else {
+        this.ctx.fillStyle = TILES[(colour % 5)];
+      }
       this.ctx.fillRect(x * tile_w + 1, y * tile_h - 1, tile_w - 1, tile_h - 1);
     }
   };
@@ -39,7 +47,6 @@ var graphicsConstructor = function () {
 
 var worldConstructor = function (xsize, ysize) {
   "use strict";
-  // Private
   var stage = initStage(xsize, ysize);
 
   function x_max() {

@@ -8,7 +8,7 @@ var roomBuilderConstructor = function (world, attempts) {
     digRoom: function (world, room) {
       for(var y = room.y; y <= room.y + room.h; y++) {
         for(var x = room.x; x <= room.x + room.w; x++) {
-          world.stage[y][x] = 1;
+          world.stage[y][x] = room.colour;
         }
       }
     },
@@ -51,6 +51,7 @@ var roomBuilderConstructor = function (world, attempts) {
     placeRoom: function () {
       var room = this.randomRoom(this.world);
       if (this.checkRoomCollisions(this.world, room) === false) {
+        room.colour = colourGenerator.next();
         this.digRoom(this.world, room);
         this.rooms.push(room);
         return true;
@@ -190,7 +191,7 @@ function passageCarver(world, x0, y0) {
       if (!done) {
         timeout();
       }
-    }, 1);
+    }, 0);
   }
   timeout();
 }
