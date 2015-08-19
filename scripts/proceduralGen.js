@@ -64,17 +64,18 @@ var roomBuilderConstructor = function (world, attempts) {
         this.attempts = this.attempts - 1;
         var wasSuccessful = this.placeRoom();
         if (wasSuccessful === true) {
-          return;
+          return false;  // Not done yet
         }
       }
+      return true;  // Now we're done
     },
 
-    run: function () {
+    animate: function () {
       var that = this;
       var done;
       function timeout() {
         setTimeout(function () {
-          that.update();
+          done = that.update();
           that.world.render();
           if (!done) {
             timeout();
@@ -116,8 +117,9 @@ function passageCarver(world, x0, y0) {
       _.forEach(_.shuffle(directions), function (direction) {
         direction(x, y);
       });
-    } else {  // Send a signal to the game loop to stop
       return false;
+    } else {  // Send a signal to the game loop to stop
+      return true;
     }
   }
 
@@ -169,21 +171,26 @@ function passageCarver(world, x0, y0) {
     return tiles;
   }
 
-  function timeout() {
-    var done;
-    setTimeout(function () {
-      delveDeeper();
-      world.render();
-      if (!done) {
-        timeout();
-      }
-    }, 0);
+  function animate() {
+    function timeout() {
+      var done;
+      setTimeout(function () {
+        done = delveDeeper();
+        world.render();
+        if (!done) {
+          timeout();
+        }
+      }, 0);
+    }
+    timeout();
   }
-  timeout();
+
+  animate();
 }
 
 
 function oddRng(min, max) {
+  'use strict';
 	var rn = _.random(min, max);
 	if (rn % 2 === 0) {
 		if (rn === max) {
@@ -199,6 +206,7 @@ function oddRng(min, max) {
 }
 
 function evenize(x) {
+  'use strict';
 	if (x === 0) { return x; }
 	return _.floor(x / 2) * 2;
 }
@@ -213,5 +221,5 @@ var colourGenerator = {
 
 var world = worldConstructor(50, 50);
 var roomBuilder = roomBuilderConstructor(world, 100);
-roomBuilder.run();
+roomBuilder.animate();
 passageCarver(world, 0, 0);
