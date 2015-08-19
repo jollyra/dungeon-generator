@@ -83,7 +83,16 @@ var roomBuilderConstructor = function (world, attempts) {
         }, 0);
       }
       timeout();
+    },
+
+    quickRender: function () {
+      var that = this;
+      var done;
+      while (!done) {
+        done = that.update();
       }
+      that.world.render();
+    }
   };
 
   var newRoomBuilder = Object.create(roomBuilder);
@@ -185,7 +194,16 @@ function passageCarver(world, x0, y0) {
     timeout();
   }
 
-  animate();
+  function quickRender() {
+    var done;
+    while (!done) {
+      done = delveDeeper();
+    }
+    world.render();
+  }
+
+  //animate();
+  quickRender();
 }
 
 
@@ -221,5 +239,6 @@ var colourGenerator = {
 
 var world = worldConstructor(50, 50);
 var roomBuilder = roomBuilderConstructor(world, 100);
-roomBuilder.animate();
+//roomBuilder.animate();
+roomBuilder.quickRender();
 passageCarver(world, 0, 0);
