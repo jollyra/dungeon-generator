@@ -113,7 +113,7 @@ function passageCarver(world, x0, y0) {
         pushUp,
         pushDown
       ];
-      _.each(_.shuffle(directions), function (direction) {
+      _.forEach(_.shuffle(directions), function (direction) {
         direction(x, y);
       });
     } else {  // Send a signal to the game loop to stop
@@ -149,39 +149,14 @@ function passageCarver(world, x0, y0) {
     if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
       return false;
     }
-    if (world.stage[y][x] !== 0) {
-      return false;
-    }
+    var adjacentStructures = 0;
     var adjacentTiles = calculateAdjacentTiles(x, y);
-    var adjacentSameColorTiles = 0;
-    if (world.getTile(x - 1, y) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (world.getTile(x + 1, y) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (world.getTile(x, y + 1) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (world.getTile(x, y - 1) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (world.getTile(x - 1, y - 1) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (world.getTile(x - 1, y + 1) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (world.getTile(x + 1, y + 1) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (world.getTile(x + 1, y - 1) > 0) {
-      adjacentSameColorTiles = adjacentSameColorTiles + 1;
-    }
-    if (adjacentSameColorTiles > 2) {
-      return false;
-    }
-    return true;
+    _.forEach(adjacentTiles, function (tile) {
+      if (world.getTile(tile.x, tile.y) > 0) {  // Can't be adjacent to anything other that rock
+        adjacentStructures = adjacentStructures + 1;
+      }
+    });
+    return adjacentStructures <= 2;  // A passage can connect to itself (of course)
   }
 
   function calculateAdjacentTiles(x0, y0) {
