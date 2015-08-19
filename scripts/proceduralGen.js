@@ -111,20 +111,12 @@ function passageCarver(world, x0, y0) {
   function delveDeeper() {
     if (stack.length > 0) {
       var tile = stack.pop();
-      var x = tile.x;
-      var y = tile.y;
-      if (canDig(colour, x, y) === false) {
+      if (canDig(colour, tile.x, tile.y) === false) {
         return false;
       }
       world.stage[tile.y][tile.x] = colour;
-      var directions = [
-        pushRight,
-        pushLeft,
-        pushUp,
-        pushDown
-      ];
-      _.forEach(_.shuffle(directions), function (direction) {
-        direction(x, y);
+      _.forEach(_.shuffle([pushRight, pushLeft, pushUp, pushDown]), function (direction) {
+        direction(tile.x, tile.y);
       });
       return false;
     } else {  // Send a signal to the game loop to stop
