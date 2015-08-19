@@ -152,6 +152,7 @@ function passageCarver(world, x0, y0) {
     if (world.stage[y][x] !== 0) {
       return false;
     }
+    var adjacentTiles = calculateAdjacentTiles(x, y);
     var adjacentSameColorTiles = 0;
     if (world.getTile(x - 1, y) > 0) {
       adjacentSameColorTiles = adjacentSameColorTiles + 1;
@@ -181,6 +182,16 @@ function passageCarver(world, x0, y0) {
       return false;
     }
     return true;
+  }
+
+  function calculateAdjacentTiles(x0, y0) {
+    var tiles = [];
+    for (var x = x0 - 1; x <= x0 + 1; x++) {
+      for (var y = y0 - 1; y <= y0 + 1; y++) {
+        tiles.push({x: x, y: y});
+      }
+    }
+    return tiles;
   }
 
   function timeout() {
