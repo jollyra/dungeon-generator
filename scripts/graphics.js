@@ -21,8 +21,8 @@ var graphicsConstructor = function () {
       var tile_h = 5;
       var TILES = {
         0: "#333300",  // Rock
-        1: "#c8cb77",
-        2: "#1b85b8",
+        1: "#1b85b8",
+        2: "#c8cb77",
         3: "#559e83",
         4: "#ae5a41",
         5: "#c3cb71"
@@ -34,7 +34,7 @@ var graphicsConstructor = function () {
       if (colour === 0) {
         this.ctx.fillStyle = TILES[colour];
       } else {
-        this.ctx.fillStyle = TILES[(colour % 5)];
+        this.ctx.fillStyle = TILES[(colour % 5) + 1];
       }
       this.ctx.fillRect(x * tile_w + 1, y * tile_h - 1, tile_w - 1, tile_h - 1);
     }
