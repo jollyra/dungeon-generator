@@ -1,6 +1,3 @@
-/* Tries a certain number of times to place random sized rooms within the
- * constraints of the supplied stage. Rooms must not overlap.
- */
 var roomBuilderConstructor = function (world, attempts) {
   "use strict";
 
@@ -102,11 +99,24 @@ var roomBuilderConstructor = function (world, attempts) {
   return newRoomBuilder;
 };
 
+
+function findStartingTiles(world) {
+  var startingTiles = [];
+  for (var y = 0; y < world.y_max; y++) {
+    for (var x = 0; x < world.x_max; x++) {
+      _.forEach(calculateAdjacentTiles(x, y), function (tile) {
+        // TODO
+      });
+    }
+  }
+}
+
 function passageCarver(world, x0, y0) {
   'use strict';
   var stack = [];
   stack.push({x: x0, y: y0});
   var colour = colourGenerator.next();
+
 
   function delveDeeper() {
     if (stack.length > 0) {
@@ -162,16 +172,6 @@ function passageCarver(world, x0, y0) {
     return adjacentStructures <= 2;  // A passage can connect to itself (of course)
   }
 
-  function calculateAdjacentTiles(x0, y0) {
-    var tiles = [];
-    for (var x = x0 - 1; x <= x0 + 1; x++) {
-      for (var y = y0 - 1; y <= y0 + 1; y++) {
-        tiles.push({x: x, y: y});
-      }
-    }
-    return tiles;
-  }
-
   function animate() {
     function timeout() {
       var done;
@@ -198,6 +198,16 @@ function passageCarver(world, x0, y0) {
   quickRender();
 }
 
+function calculateAdjacentTiles(x0, y0) {
+  'use strict';
+  var tiles = [];
+  for (var x = x0 - 1; x <= x0 + 1; x++) {
+    for (var y = y0 - 1; y <= y0 + 1; y++) {
+      tiles.push({x: x, y: y});
+    }
+  }
+  return tiles;
+}
 
 function oddRng(min, max) {
   'use strict';
