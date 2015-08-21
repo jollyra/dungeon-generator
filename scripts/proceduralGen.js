@@ -99,6 +99,16 @@ var roomBuilderConstructor = function (world, attempts) {
   return newRoomBuilder;
 };
 
+/* Now cover the rest of the free space with passages.
+ * Do this by letting a random maze generating algorithm loose in the dungeon.
+ */
+function carvePassages(world) {
+  var tile = findStartingTile(world);
+  if (tile) {
+    passageCarver(world, tile.x, tile.y);
+    carvePassages(world);
+  }
+}
 
 function findStartingTile(world) {
   var startingTiles = [];
@@ -187,14 +197,6 @@ function passageCarver(world, x0, y0) {
 
   //animate();
   quickRender();
-}
-
-function carvePassages(world) {
-  var tile = findStartingTile(world);
-  if (tile) {
-    passageCarver(world, tile.x, tile.y);
-    carvePassages(world);
-  }
 }
 
 function canDig(x, y) {
