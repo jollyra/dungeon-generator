@@ -100,7 +100,7 @@ var roomBuilderConstructor = function (world, attempts) {
 };
 
 
-function findStartingTiles(world) {
+function findStartingTile(world) {
   var startingTiles = [];
   for (var y = 0; y < world.y_max; y++) {
     for (var x = 0; x < world.x_max; x++) {
@@ -111,8 +111,7 @@ function findStartingTiles(world) {
         }
       });
       if (valid === true) {
-        startingTiles.push({x: x, y: y});
-        world.stage[y][x] = colourGenerator.next();
+        return {x: x, y: y};
       }
     }
   }
@@ -123,7 +122,6 @@ function passageCarver(world, x0, y0) {
   var stack = [];
   stack.push({x: x0, y: y0});
   var colour = colourGenerator.next();
-
 
   function delveDeeper() {
     if (stack.length > 0) {
@@ -191,6 +189,14 @@ function passageCarver(world, x0, y0) {
   quickRender();
 }
 
+function carvePassages(world) {
+  var tile = findStartingTile(world);
+  if (tile) {
+    passageCarver(world, tile.x, tile.y);
+    carvePassages(world);
+  }
+}
+
 function canDig(x, y) {
   if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
     return false;
@@ -250,7 +256,6 @@ var world = worldConstructor(50, 50);
 var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
-passageCarver(world, 0, 0);
-
-findStartingTiles(world);
 world.render();
+
+carvePassages(world);

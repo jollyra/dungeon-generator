@@ -1,7 +1,7 @@
 var initCanvas = function () {
   "use strict";
-  var CANVAS_WIDTH = 480;
-  var CANVAS_HEIGHT = 320;
+  var CANVAS_WIDTH = 980;
+  var CANVAS_HEIGHT = 720;
 
   function initCanvasInternal() {
     var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'></canvas>");
@@ -17,8 +17,8 @@ var graphicsConstructor = function () {
   "use strict";
   var graphics = {
     drawTile: function (x, y, colour) {
-      var tile_w = 5;
-      var tile_h = 5;
+      var tile_w = 10;
+      var tile_h = 10;
       var TILES = {
         0: "#333300",  // Rock
         1: "#1b85b8",
