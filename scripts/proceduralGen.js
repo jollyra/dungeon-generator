@@ -104,9 +104,16 @@ function findStartingTiles(world) {
   var startingTiles = [];
   for (var y = 0; y < world.y_max; y++) {
     for (var x = 0; x < world.x_max; x++) {
+      var valid = true;
       _.forEach(calculateAdjacentTiles(x, y), function (tile) {
-        // TODO
+        if (world.getTile(tile.x, tile.y) !== 0) {
+          valid = false;
+        }
       });
+      if (valid === true) {
+        startingTiles.push({x: x, y: y});
+        world.stage[y][x] = colourGenerator.next();
+      }
     }
   }
 }
@@ -121,7 +128,7 @@ function passageCarver(world, x0, y0) {
   function delveDeeper() {
     if (stack.length > 0) {
       var tile = stack.pop();
-      if (canDig(colour, tile.x, tile.y) === false) {
+      if (canDig(tile.x, tile.y) === false) {
         return false;
       }
       world.stage[tile.y][tile.x] = colour;
@@ -135,41 +142,27 @@ function passageCarver(world, x0, y0) {
   }
 
   function pushRight(x, y) {
-    if (canDig(colour, x + 1, y)) {
+    if (canDig(x + 1, y)) {
       stack.push({x: x + 1, y: y});
     }
   }
 
   function pushLeft(x, y) {
-    if (canDig(colour, x - 1, y)) {
+    if (canDig(x - 1, y)) {
       stack.push({x: x - 1, y: y});
     }
   }
 
   function pushUp(x, y) {
-    if (canDig(colour, x, y - 1)) {
+    if (canDig(x, y - 1)) {
       stack.push({x: x, y: y - 1});
     }
   }
 
   function pushDown(x, y) {
-    if (canDig(colour, x, y + 1)) {
+    if (canDig(x, y + 1)) {
       stack.push({x: x, y: y + 1});
     }
-  }
-
-  function canDig(colour, x, y) {
-    if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
-      return false;
-    }
-    var adjacentStructures = 0;
-    var adjacentTiles = calculateAdjacentTiles(x, y);
-    _.forEach(adjacentTiles, function (tile) {
-      if (world.getTile(tile.x, tile.y) > 0) {  // Can't be adjacent to anything other that rock
-        adjacentStructures = adjacentStructures + 1;
-      }
-    });
-    return adjacentStructures <= 2;  // A passage can connect to itself (of course)
   }
 
   function animate() {
@@ -196,6 +189,20 @@ function passageCarver(world, x0, y0) {
 
   //animate();
   quickRender();
+}
+
+function canDig(x, y) {
+  if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
+    return false;
+  }
+  var adjacentStructures = 0;
+  var adjacentTiles = calculateAdjacentTiles(x, y);
+  _.forEach(adjacentTiles, function (tile) {
+    if (world.getTile(tile.x, tile.y) > 0) {  // Can't be adjacent to anything other that rock
+      adjacentStructures = adjacentStructures + 1;
+    }
+  });
+  return adjacentStructures <= 2;  // A passage can connect to itself (of course)
 }
 
 function calculateAdjacentTiles(x0, y0) {
@@ -244,3 +251,6 @@ var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 passageCarver(world, 0, 0);
+
+findStartingTiles(world);
+world.render();
