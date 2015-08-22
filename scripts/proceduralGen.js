@@ -236,8 +236,10 @@ function calculateAdjacentTiles(x0, y0) {
  *    you want the resulting dungeon
  */
 function findAllConnectors(rooms, passages) {
-  console.log(rooms);
-  console.log(passages);
+  'use strict';
+  var graph = [];  // A list of the connected nodes
+  var nodes = rooms.concat(passages);
+  console.log(nodes);
 }
 
 function oddRng(min, max) {
