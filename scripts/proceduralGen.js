@@ -99,16 +99,6 @@ var roomBuilderConstructor = function (world, attempts) {
   return newRoomBuilder;
 };
 
-/* Now cover the rest of the free space with passages.
- * Do this by letting a random maze generating algorithm loose in the dungeon.
- */
-function carvePassages(world) {
-  var tile = findStartingTile(world);
-  if (tile) {
-    passageCarver(world, tile.x, tile.y);
-    carvePassages(world);
-  }
-}
 
 function findStartingTile(world) {
   var startingTiles = [];
@@ -199,6 +189,14 @@ function passageCarver(world, x0, y0) {
   quickRender();
 }
 
+function carvePassages(world) {
+  var tile = findStartingTile(world);
+  if (tile) {
+    passageCarver(world, tile.x, tile.y);
+    carvePassages(world);
+  }
+}
+
 function canDig(x, y) {
   if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
     return false;
@@ -223,6 +221,14 @@ function calculateAdjacentTiles(x0, y0) {
   }
   return tiles;
 }
+
+/* Connect all nodes in the graph - nodes are same coloured regions (passages, rooms).
+ * Steps:
+ * 1. fully connect the graph
+ * 2. find a spanning tree of the graph
+ * 3. add back some redundant connections depending on how connected
+ *    you want the resulting dungeon
+ */
 
 function oddRng(min, max) {
   'use strict';
