@@ -189,12 +189,18 @@ function passageCarver(world, x0, y0) {
   quickRender();
 }
 
+// Return the starting points of all passages created
 function carvePassages(world) {
-  var tile = findStartingTile(world);
-  if (tile) {
-    passageCarver(world, tile.x, tile.y);
-    carvePassages(world);
-  }
+  var passages = [];
+  function fn() {
+    var tile = findStartingTile(world);
+    if (tile) {
+      passageCarver(world, tile.x, tile.y);
+      passages.push(tile);
+      fn(world);
+    }
+  } fn(world);
+  return passages;
 }
 
 function canDig(x, y) {
@@ -229,6 +235,10 @@ function calculateAdjacentTiles(x0, y0) {
  * 3. add back some redundant connections depending on how connected
  *    you want the resulting dungeon
  */
+function findAllConnectors(rooms, passages) {
+  console.log(rooms);
+  console.log(passages);
+}
 
 function oddRng(min, max) {
   'use strict';
@@ -264,6 +274,6 @@ var world = worldConstructor(50, 50);
 var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
+world.passages = carvePassages(world);
+findAllConnectors(roomBuilder.rooms, world.passages);
 world.render();
-
-carvePassages(world);
