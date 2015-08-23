@@ -235,11 +235,32 @@ function calculateAdjacentTiles(x0, y0) {
  * 3. add back some redundant connections depending on how connected
  *    you want the resulting dungeon
  */
-function findAllConnectors(rooms, passages) {
+function findAllConnectors(world, rooms, passages) {
   'use strict';
-  var graph = [];  // A list of the connected nodes
-  var nodes = rooms.concat(passages);
-  console.log(nodes);
+  //var graph = [];  // A list of the connected nodes
+  //var nodes = rooms.concat(passages);
+  var connectors = [];
+  for (var y = 0; y < world.y_max; y++) {
+    for (var x = 0; x < world.x_max; x++) {
+      if (world.getTile(x, y) === 0) {
+        var w = world.getTile(x - 1, y) || 0;
+        var e = world.getTile(x + 1, y) || 0;
+        if (w !== 0 && e !== 0 && w !== e) {
+          // We found a connector!
+          world.stage[y][x] = 9999;  // TODO: remove this debugging logic
+          console.log(x, y);
+        }
+        var n = world.getTile(x, y - 1) || 0;
+        var s = world.getTile(x, y + 1) || 0;
+        if (n !== 0 && s !== 0 && n !== s) {
+          // We found a connector!
+          world.stage[y][x] = 9999;
+          console.log(x, y);
+        }
+      }
+    }
+  }
+  return connectors;
 }
 
 function oddRng(min, max) {
@@ -277,5 +298,5 @@ var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 world.passages = carvePassages(world);
-findAllConnectors(roomBuilder.rooms, world.passages);
+findAllConnectors(world, roomBuilder.rooms, world.passages);
 world.render();
