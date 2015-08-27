@@ -101,7 +101,7 @@ var roomBuilderConstructor = function (world, attempts) {
 
 
 function findStartingTile(world) {
-  var startingTiles = [];
+  'use strict';
   for (var y = 0; y < world.y_max; y++) {
     for (var x = 0; x < world.x_max; x++) {
       var valid = true;
@@ -196,6 +196,7 @@ function carvePassages(world) {
     var tile = findStartingTile(world);
     if (tile) {
       passageCarver(world, tile.x, tile.y);
+      tile.colour = world.stage[tile.y][tile.x];
       passages.push(tile);
       fn(world);
     }
@@ -228,17 +229,8 @@ function calculateAdjacentTiles(x0, y0) {
   return tiles;
 }
 
-/* Connect all nodes in the graph - nodes are same coloured regions (passages, rooms).
- * Steps:
- * 1. fully connect the graph
- * 2. find a spanning tree of the graph
- * 3. add back some redundant connections depending on how connected
- *    you want the resulting dungeon
- */
-function findAllConnectors(world, rooms, passages) {
+function findAllConnectors(world) {
   'use strict';
-  //var graph = [];  // A list of the connected nodes
-  //var nodes = rooms.concat(passages);
   var connectors = [];
   for (var y = 0; y < world.y_max; y++) {
     for (var x = 0; x < world.x_max; x++) {
@@ -246,21 +238,73 @@ function findAllConnectors(world, rooms, passages) {
         var w = world.getTile(x - 1, y) || 0;
         var e = world.getTile(x + 1, y) || 0;
         if (w !== 0 && e !== 0 && w !== e) {
-          // We found a connector!
-          world.stage[y][x] = 9999;  // TODO: remove this debugging logic
-          console.log(x, y);
+          connectors.push({x: x, y: y, colour1: w, colour2: e});
+          //world.stage[y][x] = 9999;  // TODO: remove this debugging logic
         }
         var n = world.getTile(x, y - 1) || 0;
         var s = world.getTile(x, y + 1) || 0;
         if (n !== 0 && s !== 0 && n !== s) {
-          // We found a connector!
-          world.stage[y][x] = 9999;
-          console.log(x, y);
+          connectors.push({x: x, y: y, colour1: n, colour2: s});
+          //world.stage[y][x] = 9999;
         }
       }
     }
   }
   return connectors;
+}
+
+/* 1. Pick a connector at random
+ * 2. If it connects a new node keep it, else discard it
+ * 3. Repeat until all nodes are connected
+ */
+function connectNodes(world, rooms, passages) {
+  'use strict';
+  var nodes = rooms.concat(passages);
+  var nodesMap = {};
+  _.forEach(nodes, function (node) {
+    nodesMap[node.colour] = node;
+  });
+  //console.log(nodesMap);
+
+  var connectors = findAllConnectors(world);
+  connectors = _.shuffle(connectors);
+
+  var graph = [];  // A list of the connected nodes
+  // graph examples: [[132],[4], [56]]
+  var keepers = [];
+  var connector;
+  while (connectors.length > 0) {
+    console.log('graph:', graph);
+    connector = connectors.pop();
+
+    var connected = false;
+    _.forEach(graph, function (node) {
+      if (_.indexOf(node, connector.colour1 !== -1) || _.indexOf(node, connector.colour2 !== -1)) {
+        connected = true;
+      }
+    });
+    if (connected === false) {
+      graph.push([connector.colour1, connector.colour2]);
+      keepers.push(connector);
+    } else {
+      _.forEach(graph, function (node) {
+        if (_.indexOf(node, connector.colour1 !== -1)) {
+          if  (_.indexOf(node, connector.colour2 === -1)) {
+            node.push(connector.colour2);
+            keepers.push(connector);
+          }
+        } else if (_.indexOf(node, connector.colour2 !== -1)) {
+          if (_.indexOf(node, connector.colour1 === -1)) {
+            node.push(connector.colour1);
+            keepers.push(connector);
+          }
+        }
+      });
+    }
+
+  }
+  console.log(keepers);
+  return keepers;
 }
 
 function oddRng(min, max) {
@@ -287,16 +331,18 @@ function evenize(x) {
 
 var colourGenerator = {
 	count: 0,
+  colours: [],
 	next: function () {
-		this.count = this.count + 1;
+		this.count++;
+    this.colours.push(this.count);
 		return this.count;
 	}
 };
 
-var world = worldConstructor(50, 50);
+var world = worldConstructor(18, 18);
 var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 world.passages = carvePassages(world);
-findAllConnectors(world, roomBuilder.rooms, world.passages);
+connectNodes(world, roomBuilder.rooms, world.passages);
 world.render();
