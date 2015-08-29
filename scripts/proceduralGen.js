@@ -276,32 +276,7 @@ function connectNodes(world, rooms, passages) {
   while (connectors.length > 0) {
     console.log('graph:', graph);
     connector = connectors.pop();
-
-    var connected = false;
-    _.forEach(graph, function (node) {
-      if (_.indexOf(node, connector.colour1 !== -1) || _.indexOf(node, connector.colour2 !== -1)) {
-        connected = true;
-      }
-    });
-    if (connected === false) {
-      graph.push([connector.colour1, connector.colour2]);
-      keepers.push(connector);
-    } else {
-      _.forEach(graph, function (node) {
-        if (_.indexOf(node, connector.colour1 !== -1)) {
-          if  (_.indexOf(node, connector.colour2 === -1)) {
-            node.push(connector.colour2);
-            keepers.push(connector);
-          }
-        } else if (_.indexOf(node, connector.colour2 !== -1)) {
-          if (_.indexOf(node, connector.colour1 === -1)) {
-            node.push(connector.colour1);
-            keepers.push(connector);
-          }
-        }
-      });
-    }
-
+    // TODO: implement connections
   }
   console.log(keepers);
   return keepers;
