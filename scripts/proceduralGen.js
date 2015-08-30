@@ -253,33 +253,32 @@ function findAllConnectors(world) {
   return connectors;
 }
 
-/* 1. Pick a connector at random
- * 2. If it connects a new node keep it, else discard it
- * 3. Repeat until all nodes are connected
- */
-function connectNodes(world, rooms, passages) {
+function floodFill(world, rooms, passages) {
   'use strict';
+  var connectors = _.shuffle(findAllConnectors(world));
   var nodes = rooms.concat(passages);
   var nodesMap = {};
   _.forEach(nodes, function (node) {
     nodesMap[node.colour] = node;
   });
-  //console.log(nodesMap);
-
-  var connectors = findAllConnectors(world);
-  connectors = _.shuffle(connectors);
-
-  var graph = [];  // A list of the connected nodes
-  // graph examples: [[132],[4], [56]]
-  var keepers = [];
-  var connector;
-  while (connectors.length > 0) {
-    console.log('graph:', graph);
-    connector = connectors.pop();
-    // TODO: implement connections
+  //var worldClone = _.cloneDeep(world);
+  var stack = [nodes[0]];
+  while (stack.length > 0) {
+    if (stack.length > 100) {
+      return;
+    }
+    var tile = stack.pop();
+    console.log('Stack: ', tile, world.getTile(tile.y, tile.x), world.getTile(tile.x, tile.y));
+    world.stage[tile.y][tile.x] = 'visited';
+    _.forEach(calculateAdjacentTiles(tile.x, tile.y), function (t) {
+      if (world.getTile(t.x, t.y) !== 'visited' && world.getTile(t.x, t.y) !== 0) {
+        //console.log('stack', stack.length, 'pushing tile', t);
+        stack.push(t);
+      } else {
+        //console.log(t, 'was visited', stageClone[t.y][t.x]);
+      }
+    });
   }
-  console.log(keepers);
-  return keepers;
 }
 
 function oddRng(min, max) {
@@ -319,5 +318,5 @@ var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 world.passages = carvePassages(world);
-connectNodes(world, roomBuilder.rooms, world.passages);
+floodFill(world, roomBuilder.rooms, world.passages);
 world.render();
