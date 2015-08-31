@@ -255,6 +255,7 @@ function findAllConnectors(world) {
 
 function floodFill(world, startingTile) {
   'use strict';
+  var nodesTraversed = [];
   var connectors = _.shuffle(findAllConnectors(world));
   var stack = [startingTile];
   while (stack.length > 0) {
@@ -262,10 +263,13 @@ function floodFill(world, startingTile) {
     world.stage[tile.y][tile.x] = 'visited';
     _.forEach([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x + 1, y: tile.y - 1}], function (t) {
       if (world.getTile(t.x, t.y) !== 'visited' && world.getTile(t.x, t.y) > 0) {
+        nodesTraversed = _.union(nodesTraversed, [world.getTile(t.x, t.y)]);
         stack.push(t);
       }
     });
   }
+  console.log(nodesTraversed, nodesTraversed.length);
+  return nodesTraversed.length;
 }
 
 function oddRng(min, max) {
