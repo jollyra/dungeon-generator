@@ -274,9 +274,6 @@ function floodFill(world, rooms, passages) {
       if (world.getTile(t.x, t.y) !== 'visited' && world.getTile(t.x, t.y) !== 0) {
         //console.log('stack', stack.length, 'pushing tile', t);
         stack.push(t);
-      } else {
-        //console.log(t, 'was visited', stageClone[t.y][t.x]);
-      }
     });
   }
 }
