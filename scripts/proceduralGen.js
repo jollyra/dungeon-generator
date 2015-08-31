@@ -253,27 +253,17 @@ function findAllConnectors(world) {
   return connectors;
 }
 
-function floodFill(world, rooms, passages) {
+function floodFill(world, startingTile) {
   'use strict';
   var connectors = _.shuffle(findAllConnectors(world));
-  var nodes = rooms.concat(passages);
-  var nodesMap = {};
-  _.forEach(nodes, function (node) {
-    nodesMap[node.colour] = node;
-  });
-  //var worldClone = _.cloneDeep(world);
-  var stack = [nodes[0]];
+  var stack = [startingTile];
   while (stack.length > 0) {
-    if (stack.length > 100) {
-      return;
-    }
     var tile = stack.pop();
-    console.log('Stack: ', tile, world.getTile(tile.y, tile.x), world.getTile(tile.x, tile.y));
     world.stage[tile.y][tile.x] = 'visited';
-    _.forEach(calculateAdjacentTiles(tile.x, tile.y), function (t) {
-      if (world.getTile(t.x, t.y) !== 'visited' && world.getTile(t.x, t.y) !== 0) {
-        //console.log('stack', stack.length, 'pushing tile', t);
+    _.forEach([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x + 1, y: tile.y - 1}], function (t) {
+      if (world.getTile(t.x, t.y) !== 'visited' && world.getTile(t.x, t.y) > 0) {
         stack.push(t);
+      }
     });
   }
 }
@@ -315,5 +305,5 @@ var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 world.passages = carvePassages(world);
-floodFill(world, roomBuilder.rooms, world.passages);
+floodFill(world, roomBuilder.rooms[0]);
 world.render();
