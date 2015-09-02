@@ -229,6 +229,21 @@ function calculateAdjacentTiles(x0, y0) {
   return tiles;
 }
 
+function connectDungeon(world) {
+  var connectors = _.shuffle(findAllConnectors(world));
+  var connector;
+  var connectedRegions = 0;
+  while(connectors.length > 0) {
+    connector = connectors.pop();
+    var prevColour = world.getTile(connector.x, connector.y);
+    world.stage[connector.y][connector.x] = 'connector';
+    if (floodFill(world, connector) <= connectedRegions) {
+      // We didn't connect any new nodes so discard that connector
+      world.stage[connector.y][connector.x] = prevColour;  // Leave things the way we found them
+    }
+  }
+}
+
 function findAllConnectors(world) {
   'use strict';
   var connectors = [];
@@ -256,13 +271,13 @@ function findAllConnectors(world) {
 function floodFill(world, startingTile) {
   'use strict';
   var nodesTraversed = [];
-  var connectors = _.shuffle(findAllConnectors(world));
   var stack = [startingTile];
+  var clone = _.cloneDeep(world.stage);
   while (stack.length > 0) {
     var tile = stack.pop();
-    world.stage[tile.y][tile.x] = 'visited';
+    clone[tile.y][tile.x] = 'visited';
     _.forEach([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x + 1, y: tile.y - 1}], function (t) {
-      if (world.getTile(t.x, t.y) !== 'visited' && world.getTile(t.x, t.y) > 0) {
+      if (clone[t.y] && clone[t.y][t.x] !== 'visited' && clone[t.y] && clone[t.y][t.x] > 0) {
         nodesTraversed = _.union(nodesTraversed, [world.getTile(t.x, t.y)]);
         stack.push(t);
       }
@@ -309,5 +324,6 @@ var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 world.passages = carvePassages(world);
-floodFill(world, roomBuilder.rooms[0]);
+connectDungeon(world);
+//floodFill(world, roomBuilder.rooms[0]);
 world.render();

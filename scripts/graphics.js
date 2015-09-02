@@ -33,7 +33,7 @@ var graphicsConstructor = function () {
       // Draw the tile over the border tile.
       if (colour === 0) {
         this.ctx.fillStyle = TILES[colour];
-      } else if (colour === 'visited') {
+      } else if (colour === 'visited' || colour === 'connector') {  // Debugging
         this.ctx.fillStyle = "#ffffff";
       } else {
         this.ctx.fillStyle = TILES[(colour % 5) + 1];
@@ -80,7 +80,7 @@ var worldConstructor = function (xsize, ysize) {
 
   // Public
   var world = {
-    getTile: function (x, y) {
+      getTile: function (x, y) {
       if (this.stage[y] === undefined || this.stage[y][x] === undefined) {
         return false;
       } else {
