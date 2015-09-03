@@ -230,16 +230,23 @@ function calculateAdjacentTiles(x0, y0) {
 }
 
 function connectDungeon(world) {
-  var connectors = _.shuffle(findAllConnectors(world));
+  var connectors = findAllConnectors(world);
+  // Place all connectors in the dungeon
+  _.each(connectors, function (connector) {
+    world.stage[connector.y][connector.x] = 'connector';
+  });
+  // Remove connectors until we have an MSP
+
+  connectors = _.shuffle(connectors);
   var connector;
-  var connectedRegions = 0;
+  var connectedRegions = floodFill(world, connectors[0]);
+  world.render();
   while(connectors.length > 0) {
     connector = connectors.pop();
-    var prevColour = world.getTile(connector.x, connector.y);
-    world.stage[connector.y][connector.x] = 'connector';
-    if (floodFill(world, connector) <= connectedRegions) {
-      // We didn't connect any new nodes so discard that connector
-      world.stage[connector.y][connector.x] = prevColour;  // Leave things the way we found them
+    world.stage[connector.y][connector.x] = 0;
+    if (floodFill(world, connector) < connectedRegions) {
+      // This means we need this connector - add it back
+      world.stage[connector.y][connector.x] = 'connector';
     }
   }
 }
@@ -253,13 +260,13 @@ function findAllConnectors(world) {
         var w = world.getTile(x - 1, y) || 0;
         var e = world.getTile(x + 1, y) || 0;
         if (w !== 0 && e !== 0 && w !== e) {
-          connectors.push({x: x, y: y, colour1: w, colour2: e});
+          connectors.push({x: x, y: y});
           //world.stage[y][x] = 9999;  // TODO: remove this debugging logic
         }
         var n = world.getTile(x, y - 1) || 0;
         var s = world.getTile(x, y + 1) || 0;
         if (n !== 0 && s !== 0 && n !== s) {
-          connectors.push({x: x, y: y, colour1: n, colour2: s});
+          connectors.push({x: x, y: y});
           //world.stage[y][x] = 9999;
         }
       }
@@ -276,9 +283,16 @@ function floodFill(world, startingTile) {
   while (stack.length > 0) {
     var tile = stack.pop();
     clone[tile.y][tile.x] = 'visited';
-    _.forEach([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x + 1, y: tile.y - 1}], function (t) {
-      if (clone[t.y] && clone[t.y][t.x] !== 'visited' && clone[t.y] && clone[t.y][t.x] > 0) {
-        nodesTraversed = _.union(nodesTraversed, [world.getTile(t.x, t.y)]);
+    _.forEach([
+        {x: tile.x + 1, y: tile.y},
+        {x: tile.x - 1, y: tile.y},
+        {x: tile.x, y: tile.y + 1},
+        {x: tile.x, y: tile.y - 1}
+    ], function (t) {
+      if (clone[t.y] && clone[t.y][t.x] !== 'visited' && (clone[t.y] && clone[t.y][t.x] > 0 || clone[t.y] && clone[t.y][t.x] === 'connector')) {
+        if (world.getTile(t.x, t.y) !== 'connector') {
+          nodesTraversed = _.union(nodesTraversed, [world.getTile(t.x, t.y)]);
+        }
         stack.push(t);
       }
     });
