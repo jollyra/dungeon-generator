@@ -275,7 +275,7 @@ function findAllConnectors(world) {
   return connectors;
 }
 
-function floodFill(world, startingTile) {
+function floodFill(world, startingTile, options) {
   'use strict';
   var nodesTraversed = [];
   var stack = [startingTile];
@@ -283,6 +283,9 @@ function floodFill(world, startingTile) {
   while (stack.length > 0) {
     var tile = stack.pop();
     clone[tile.y][tile.x] = 'visited';
+    if (options && options.colourIn) {
+      world.stage[tile.y][tile.x] = 9999;
+    }
     _.forEach([
         {x: tile.x + 1, y: tile.y},
         {x: tile.x - 1, y: tile.y},
@@ -340,4 +343,6 @@ roomBuilder.quickRender();
 world.passages = carvePassages(world);
 connectDungeon(world);
 //floodFill(world, roomBuilder.rooms[0]);
+world.render();
+floodFill(world, roomBuilder.rooms[0], {colourIn: true});
 world.render();
