@@ -260,13 +260,11 @@ function findAllConnectors(world) {
         var e = world.getTile(x + 1, y) || 0;
         if (w !== 0 && e !== 0 && w !== e) {
           connectors.push({x: x, y: y});
-          //world.stage[y][x] = 9999;  // TODO: remove this debugging logic
         }
         var n = world.getTile(x, y - 1) || 0;
         var s = world.getTile(x, y + 1) || 0;
         if (n !== 0 && s !== 0 && n !== s) {
           connectors.push({x: x, y: y});
-          //world.stage[y][x] = 9999;
         }
       }
     }
@@ -299,7 +297,6 @@ function floodFill(world, startingTile, options) {
       }
     });
   }
-  console.log(nodesTraversed, nodesTraversed.length);
   return nodesTraversed.length;
 }
 
@@ -312,7 +309,30 @@ function makeGraphSparse(world) {
       }
     }
   }
+  _.forEach(deadEnds, function (tile) {
+    removeDeadEnd(world, tile);
+  });
   console.log(deadEnds);
+}
+
+function removeDeadEnd(world, tile) {
+  var nextDeadEnd = tile;
+  while(nextDeadEnd) {
+    console.log(nextDeadEnd.x, nextDeadEnd.y);
+    world.stage[nextDeadEnd.y][nextDeadEnd.x] = 0;
+    _.forEach([
+        {x: tile.x + 1, y: tile.y},
+        {x: tile.x - 1, y: tile.y},
+        {x: tile.x, y: tile.y + 1},
+        {x: tile.x, y: tile.y - 1}
+    ], function (t) {
+      if (isDeadEnd(world, t) === true) {
+        nextDeadEnd = t;
+      } else {
+        nextDeadEnd = false;
+      }
+    });
+  }
 }
 
 // Return true if a tile is a deadend. Tiles are
@@ -374,4 +394,4 @@ connectDungeon(world, roomBuilder.rooms);
 world.render();
 //floodFill(world, roomBuilder.rooms[0], {colourIn: true});
 //world.render();
-makeGraphSparse(world);
+//makeGraphSparse(world);
