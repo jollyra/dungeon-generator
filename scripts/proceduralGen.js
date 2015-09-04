@@ -303,6 +303,35 @@ function floodFill(world, startingTile, options) {
   return nodesTraversed.length;
 }
 
+function makeGraphSparse(world) {
+  var deadEnds = [];
+  for (var y = 0; y < world.y_max; y++) {
+    for (var x = 0; x < world.x_max; x++) {
+      if (world.getTile(x, y) > 0 && isDeadEnd(world, {x: x, y: y})) {
+        deadEnds.push({x: x, y: y});
+      }
+    }
+  }
+  console.log(deadEnds);
+}
+
+// Return true if a tile is a deadend. Tiles are
+// deadends if there are 3 adjacent stone tiles.
+function isDeadEnd(world, tile) {
+  var adjacentStoneTiles = 0;
+  _.forEach([
+      {x: tile.x + 1, y: tile.y},
+      {x: tile.x - 1, y: tile.y},
+      {x: tile.x, y: tile.y + 1},
+      {x: tile.x, y: tile.y - 1}
+  ], function (t) {
+    if (world.getTile(t.x, t.y) === 0 || world.getTile(t.x, t.y) === false) {
+      adjacentStoneTiles++;
+    }
+  });
+  return adjacentStoneTiles >= 3;
+}
+
 function oddRng(min, max) {
   'use strict';
 	var rn = _.random(min, max);
@@ -345,3 +374,4 @@ connectDungeon(world, roomBuilder.rooms);
 world.render();
 //floodFill(world, roomBuilder.rooms[0], {colourIn: true});
 //world.render();
+makeGraphSparse(world);
