@@ -229,25 +229,24 @@ function calculateAdjacentTiles(x0, y0) {
   return tiles;
 }
 
-function connectDungeon(world) {
+function connectDungeon(world, rooms) {
   var connectors = findAllConnectors(world);
   // Place all connectors in the dungeon
   _.each(connectors, function (connector) {
     world.stage[connector.y][connector.x] = 'connector';
   });
   // Remove connectors until we have an MSP
-
   connectors = _.shuffle(connectors);
   var connector;
-  var connectedRegions = floodFill(world, connectors[0]);
-  world.render();
+  var connectedRegions = floodFill(world, connectors[connectors.length - 1]);
   while(connectors.length > 0) {
     connector = connectors.pop();
     world.stage[connector.y][connector.x] = 0;
-    if (floodFill(world, connector) < connectedRegions) {
+    if (floodFill(world, { x: rooms[0].x, y: rooms[0].y }) < connectedRegions) {
       // This means we need this connector - add it back
       world.stage[connector.y][connector.x] = 'connector';
     }
+    world.render();
   }
 }
 
@@ -341,8 +340,8 @@ var roomBuilder = roomBuilderConstructor(world, 100);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 world.passages = carvePassages(world);
-connectDungeon(world);
+connectDungeon(world, roomBuilder.rooms);
 //floodFill(world, roomBuilder.rooms[0]);
 world.render();
-floodFill(world, roomBuilder.rooms[0], {colourIn: true});
-world.render();
+//floodFill(world, roomBuilder.rooms[0], {colourIn: true});
+//world.render();
