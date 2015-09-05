@@ -367,8 +367,8 @@ var colourGenerator = {
 	}
 };
 
-var world = worldConstructor(18, 18);
-var roomBuilder = roomBuilderConstructor(world, 100);
+var world = worldConstructor(40, 40);
+var roomBuilder = roomBuilderConstructor(world, 20);
 //roomBuilder.animate();
 roomBuilder.quickRender();
 world.passages = carvePassages(world);
