@@ -1,10 +1,10 @@
 var initCanvas = function (containerDiv) {
   "use strict";
-  var CANVAS_WIDTH = 980;
-  var CANVAS_HEIGHT = 720;
+  var CANVAS_WIDTH = 400;
+  var CANVAS_HEIGHT = 400;
 
   function initCanvasInternal() {
-    var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'></canvas>");
+    var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'" + "class='" + "dungeon-generator'>" + "</canvas>");
     var ctx = canvas.get(0).getContext("2d");
     canvas.appendTo($(containerDiv));
     return ctx;
