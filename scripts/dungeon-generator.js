@@ -234,7 +234,7 @@ function passageCarver(world, x0, y0) {
   function delveDeeper() {
     if (stack.length > 0) {
       var tile = stack.pop();
-      if (canDig(tile.x, tile.y) === false) {
+      if (canDig(world, tile.x, tile.y) === false) {
         return false;
       }
       world.stage[tile.y][tile.x] = colour;
@@ -248,25 +248,25 @@ function passageCarver(world, x0, y0) {
   }
 
   function pushRight(x, y) {
-    if (canDig(x + 1, y)) {
+    if (canDig(world, x + 1, y)) {
       stack.push({x: x + 1, y: y});
     }
   }
 
   function pushLeft(x, y) {
-    if (canDig(x - 1, y)) {
+    if (canDig(world, x - 1, y)) {
       stack.push({x: x - 1, y: y});
     }
   }
 
   function pushUp(x, y) {
-    if (canDig(x, y - 1)) {
+    if (canDig(world, x, y - 1)) {
       stack.push({x: x, y: y - 1});
     }
   }
 
   function pushDown(x, y) {
-    if (canDig(x, y + 1)) {
+    if (canDig(world, x, y + 1)) {
       stack.push({x: x, y: y + 1});
     }
   }
@@ -312,7 +312,7 @@ function carvePassages(world) {
   return passages;
 }
 
-function canDig(x, y) {
+function canDig(world, x, y) {
   if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
     return false;
   }
@@ -475,14 +475,24 @@ var colourGenerator = {
 	}
 };
 
-var world = worldConstructor(40, 40);
-var roomBuilder = roomBuilderConstructor(world, 20);
-//roomBuilder.animate();
-roomBuilder.quickRender();
-world.passages = carvePassages(world);
-connectDungeon(world, roomBuilder.rooms);
-//floodFill(world, roomBuilder.rooms[0]);
-world.render();
-//floodFill(world, roomBuilder.rooms[0], {colourIn: true});
-makeGraphSparse(world);
-world.render();
+window.dungeonGenerator = {
+  defaults: {
+    size_x: 40,
+    size_y: 40,
+    roomTries: 20,
+    windyness: 0,
+    connectedness: 0,
+    deadendedness: 0
+  },
+  generate: function (options) {
+    options = options ? options : this.defaults;
+    var world = worldConstructor(options.size_x, options.size_y);
+    var roomBuilder = roomBuilderConstructor(world, options.roomTries);
+    roomBuilder.quickRender();
+    world.passages = carvePassages(world);
+    connectDungeon(world, roomBuilder.rooms);
+    world.render();
+    makeGraphSparse(world);
+    world.render();
+  }
+};
