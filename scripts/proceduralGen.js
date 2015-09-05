@@ -309,30 +309,13 @@ function makeGraphSparse(world) {
       }
     }
   }
-  _.forEach(deadEnds, function (tile) {
-    removeDeadEnd(world, tile);
-  });
-  console.log(deadEnds);
-}
 
-function removeDeadEnd(world, tile) {
-  var nextDeadEnd = tile;
-  while(nextDeadEnd) {
-    console.log(nextDeadEnd.x, nextDeadEnd.y);
-    world.stage[nextDeadEnd.y][nextDeadEnd.x] = 0;
-    _.forEach([
-        {x: tile.x + 1, y: tile.y},
-        {x: tile.x - 1, y: tile.y},
-        {x: tile.x, y: tile.y + 1},
-        {x: tile.x, y: tile.y - 1}
-    ], function (t) {
-      if (isDeadEnd(world, t) === true) {
-        nextDeadEnd = t;
-      } else {
-        nextDeadEnd = false;
-      }
-    });
-  }
+	if (deadEnds.length > 0) {
+		_.forEach(deadEnds, function (tile) {
+			world.stage[tile.y][tile.x] = 0;
+		});
+		makeGraphSparse(world);
+	}
 }
 
 // Return true if a tile is a deadend. Tiles are
@@ -393,5 +376,5 @@ connectDungeon(world, roomBuilder.rooms);
 //floodFill(world, roomBuilder.rooms[0]);
 world.render();
 //floodFill(world, roomBuilder.rooms[0], {colourIn: true});
-//world.render();
-//makeGraphSparse(world);
+makeGraphSparse(world);
+world.render();
