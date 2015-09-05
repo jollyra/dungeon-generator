@@ -233,7 +233,7 @@ function connectDungeon(world, rooms) {
   var connectors = findAllConnectors(world);
   // Place all connectors in the dungeon
   _.each(connectors, function (connector) {
-    world.stage[connector.y][connector.x] = 'connector';
+    world.stage[connector.y][connector.x] = 1001;
   });
   // Remove connectors until we have an MSP
   connectors = _.shuffle(connectors);
@@ -244,7 +244,7 @@ function connectDungeon(world, rooms) {
     world.stage[connector.y][connector.x] = 0;
     if (floodFill(world, { x: rooms[0].x, y: rooms[0].y }) < connectedRegions) {
       // This means we need this connector - add it back
-      world.stage[connector.y][connector.x] = 'connector';
+      world.stage[connector.y][connector.x] = 1001;
     }
     world.render();
   }
@@ -289,8 +289,8 @@ function floodFill(world, startingTile, options) {
         {x: tile.x, y: tile.y + 1},
         {x: tile.x, y: tile.y - 1}
     ], function (t) {
-      if (clone[t.y] && clone[t.y][t.x] !== 'visited' && (clone[t.y] && clone[t.y][t.x] > 0 || clone[t.y] && clone[t.y][t.x] === 'connector')) {
-        if (world.getTile(t.x, t.y) !== 'connector') {
+      if (clone[t.y] && clone[t.y][t.x] !== 'visited' && (clone[t.y] && clone[t.y][t.x] > 0 || clone[t.y] && clone[t.y][t.x] === 1001)) {
+        if (world.getTile(t.x, t.y) !== 1001) {
           nodesTraversed = _.union(nodesTraversed, [world.getTile(t.x, t.y)]);
         }
         stack.push(t);

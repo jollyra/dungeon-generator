@@ -33,7 +33,7 @@ var graphicsConstructor = function () {
       // Draw the tile over the border tile.
       if (colour === 0) {
         this.ctx.fillStyle = TILES[colour];
-      } else if (colour === 'visited' || colour === 'connector' || colour === 9999) {  // Debugging
+      } else if (colour === 'visited' || colour === 1001 || colour === 9999) {  // Debugging
         this.ctx.fillStyle = "#cdc9c9";
       } else {
         this.ctx.fillStyle = TILES[(colour % 5) + 1];
