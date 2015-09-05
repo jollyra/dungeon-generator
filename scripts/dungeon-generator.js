@@ -1,4 +1,4 @@
-var initCanvas = function () {
+var initCanvas = function (containerDiv) {
   "use strict";
   var CANVAS_WIDTH = 980;
   var CANVAS_HEIGHT = 720;
@@ -6,14 +6,14 @@ var initCanvas = function () {
   function initCanvasInternal() {
     var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'></canvas>");
     var ctx = canvas.get(0).getContext("2d");
-    canvas.appendTo('body');
+    canvas.appendTo($(containerDiv));
     return ctx;
   }
 
   return initCanvasInternal();
 };
 
-var graphicsConstructor = function () {
+var graphicsConstructor = function (containerDiv) {
   "use strict";
   var graphics = {
     drawTile: function (x, y, colour) {
@@ -33,7 +33,7 @@ var graphicsConstructor = function () {
       // Draw the tile over the border tile.
       if (colour === 0) {
         this.ctx.fillStyle = TILES[colour];
-      } else if (colour === 'visited' || colour === 1001 || colour === 9999) {  // Debugging
+      } else if (colour === 1001 || colour === 9999) {  // Debugging
         this.ctx.fillStyle = "#cdc9c9";
       } else {
         this.ctx.fillStyle = TILES[(colour % 5) + 1];
@@ -43,11 +43,11 @@ var graphicsConstructor = function () {
   };
 
   var newGraphics = Object.create(graphics);
-  newGraphics.ctx = initCanvas();
+  newGraphics.ctx = initCanvas(containerDiv);
   return newGraphics;
 };
 
-var worldConstructor = function (xsize, ysize) {
+var worldConstructor = function (containerDiv, xsize, ysize) {
   "use strict";
   var stage = initStage(xsize, ysize);
 
@@ -102,7 +102,7 @@ var worldConstructor = function (xsize, ysize) {
   newWorld.y_max = y_max();
   newWorld.x_max = x_max();
   newWorld.stage = stage;
-  newWorld.graphics = graphicsConstructor();
+  newWorld.graphics = graphicsConstructor(containerDiv);
   return newWorld;
 };
 
@@ -460,7 +460,6 @@ function oddRng(min, max) {
 }
 
 function evenize(x) {
-  'use strict';
 	if (x === 0) { return x; }
 	return _.floor(x / 2) * 2;
 }
@@ -484,9 +483,9 @@ window.dungeonGenerator = {
     connectedness: 0,
     deadendedness: 0
   },
-  generate: function (options) {
+  generate: function (containerDiv, options) {
     options = options ? options : this.defaults;
-    var world = worldConstructor(options.size_x, options.size_y);
+    var world = worldConstructor(containerDiv, options.size_x, options.size_y);
     var roomBuilder = roomBuilderConstructor(world, options.roomTries);
     roomBuilder.quickRender();
     world.passages = carvePassages(world);
