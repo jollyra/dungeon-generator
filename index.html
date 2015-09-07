@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/dungeon-generator-skin.css" media="screen">
   </head>
+
   <body>
     <section class="page-header">
       <h1 class="project-name">Procedural Dungeon Generator</h1>
@@ -21,10 +22,14 @@
 
     <section class="main-content">
       <h1>
-<a id="build-dungeons-with-code" class="anchor" href="#build-dungeons-with-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build Dungeons With Code</h1>
+        <a id="build-dungeons-with-code" class="anchor" href="#build-dungeons-with-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build Dungeons With Code
+      </h1>
 
-<!-- Div where dungeon canvas gets placed -->
-<div id='dungeon'></div>
+      <!-- Div where dungeon canvas gets placed -->
+      <div id='dungeon'></div>
+      <button type="button"
+        onclick="regenerateDungeon(dungeon);">
+        Generate</button>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/jollyra/procedural-dungeon-generation">Procedural Dungeon Generator</a> is maintained by <a href="https://github.com/jollyra">jollyra</a>.</span>
@@ -35,10 +40,19 @@
     </section>
 
   </body>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="lodash.js"></script>
   <script type="text/javascript" src="dungeon-generator.js"></script>
   <script>
-    dungeonGenerator.generate(dungeon);
+    $(document).ready(function () {
+      dungeonGenerator.generate(dungeon);
+    });
+
+    function regenerateDungeon(div) {
+      $(div).empty();
+      dungeonGenerator.generate(div);
+    }
   </script>
+
 </html>
