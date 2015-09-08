@@ -2,15 +2,12 @@ var initCanvas = function (containerDiv) {
   "use strict";
   var CANVAS_WIDTH = 400;
   var CANVAS_HEIGHT = 400;
-
-  function initCanvasInternal() {
+  return function () {
     var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'" + "class='" + "dungeon-generator'>" + "</canvas>");
     var ctx = canvas.get(0).getContext("2d");
     canvas.appendTo($(containerDiv));
     return ctx;
-  }
-
-  return initCanvasInternal();
+  } ();
 };
 
 var graphicsConstructor = function (containerDiv) {
@@ -33,8 +30,6 @@ var graphicsConstructor = function (containerDiv) {
       // Draw the tile over the border tile.
       if (colour === 0) {
         this.ctx.fillStyle = TILES[colour];
-      } else if (colour === 1001 || colour === 9999) {  // Debugging
-        this.ctx.fillStyle = "#cdc9c9";
       } else {
         this.ctx.fillStyle = TILES[(colour % 5) + 1];
       }
@@ -51,22 +46,6 @@ var worldConstructor = function (containerDiv, xsize, ysize) {
   "use strict";
   var stage = initStage(xsize, ysize);
 
-  function x_max() {
-    if (stage && stage[0]) {
-      return stage[0].length;
-    } else {
-      throw new Error('Where\'s my GODDAMN array? _stage = ', stage);
-    }
-  }
-
-  function y_max() {
-    if (stage) {
-      return stage.length;
-    } else {
-      throw new Error('Where\'s my GODDAMN array? _stage = ', stage);
-    }
-  }
-
   function initStage(x, y) {
     var stage =  new Array(y);
     for(var i = 0; i < y; i++) {
@@ -78,7 +57,6 @@ var worldConstructor = function (containerDiv, xsize, ysize) {
     return stage;
   }
 
-  // Public
   var world = {
       getTile: function (x, y) {
       if (this.stage[y] === undefined || this.stage[y][x] === undefined) {
@@ -99,8 +77,8 @@ var worldConstructor = function (containerDiv, xsize, ysize) {
   };
 
   var newWorld = Object.create(world);
-  newWorld.y_max = y_max();
-  newWorld.x_max = x_max();
+  newWorld.y_max = stage.length;
+  newWorld.x_max = stage[0].length;;
   newWorld.stage = stage;
   newWorld.graphics = graphicsConstructor(containerDiv);
   return newWorld;
@@ -153,51 +131,18 @@ var roomBuilderConstructor = function (world, attempts) {
       return room;
     },
 
-    placeRoom: function () {
-      var room = this.randomRoom(this.world);
-      if (this.checkRoomCollisions(this.world, room) === false) {
-        room.colour = colourGenerator.next();
-        this.digRoom(this.world, room);
-        this.rooms.push(room);
-        return true;
-      }
-      return false;
-    },
-
-    update: function () {
-      while (this.attempts > 0) {
-        this.attempts = this.attempts - 1;
-        var wasSuccessful = this.placeRoom();
-        if (wasSuccessful === true) {
-          return false;  // Not done yet
+    placeRooms: function () {
+      console.log('placing rooms');
+      for (var i = 0; i < this.attempts; i++) {
+        var room = this.randomRoom(this.world);
+        if (this.checkRoomCollisions(this.world, room) === false) {
+          room.colour = colourGenerator.next();
+          this.digRoom(this.world, room);
+          this.rooms.push(room);
         }
       }
-      return true;  // Now we're done
-    },
-
-    animate: function () {
-      var that = this;
-      var done;
-      function timeout() {
-        setTimeout(function () {
-          done = that.update();
-          that.world.render();
-          if (!done) {
-            timeout();
-          }
-        }, 0);
-      }
-      timeout();
-    },
-
-    quickRender: function () {
-      var that = this;
-      var done;
-      while (!done) {
-        done = that.update();
-      }
-      that.world.render();
     }
+
   };
 
   var newRoomBuilder = Object.create(roomBuilder);
@@ -487,7 +432,7 @@ window.dungeonGenerator = {
     options = options ? options : this.defaults;
     var world = worldConstructor(containerDiv, options.size_x, options.size_y);
     var roomBuilder = roomBuilderConstructor(world, options.roomTries);
-    roomBuilder.quickRender();
+    roomBuilder.placeRooms();
     world.passages = carvePassages(world);
     connectDungeon(world, roomBuilder.rooms);
     world.render();
