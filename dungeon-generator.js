@@ -132,7 +132,6 @@ var roomBuilderConstructor = function (world, attempts) {
     },
 
     placeRooms: function () {
-      console.log('placing rooms');
       for (var i = 0; i < this.attempts; i++) {
         var room = this.randomRoom(this.world);
         if (this.checkRoomCollisions(this.world, room) === false) {
@@ -235,10 +234,8 @@ function passageCarver(world, x0, y0) {
     while (!done) {
       done = delveDeeper();
     }
-    world.render();
   }
 
-  //animate();
   quickRender();
 }
 
@@ -282,7 +279,7 @@ function calculateAdjacentTiles(x0, y0) {
   return tiles;
 }
 
-function connectDungeon(world, rooms) {
+function connectDungeon_OLD(world, rooms) {
   var connectors = findAllConnectors(world);
   // Place all connectors in the dungeon
   _.each(connectors, function (connector) {
@@ -303,6 +300,28 @@ function connectDungeon(world, rooms) {
   }
 }
 
+function connectDungeon(world, rooms) {
+  var connectors = findAllConnectors(world);
+  // Remove connectors until we have an MSP
+  connectors = _.shuffle(connectors);
+  var connector;
+  var connectedRegions = floodFill(world, connectors[connectors.length - 1]);
+  while(connectors.length > 0) {
+    connector = connectors[connectors.length - 1];
+    if (isConnected(connectors, colourGenerator.colours)) {
+      connectors.pop();
+    }
+  }
+  // Place all connectors that we chose
+  _.each(connectors, function (connector) {
+    world.stage[connector.y][connector.x] = 1001;
+  });
+}
+
+function isConnected(connectors, nodes) {
+  console.log(nodes);
+}
+
 function findAllConnectors(world) {
   'use strict';
   var connectors = [];
@@ -312,12 +331,12 @@ function findAllConnectors(world) {
         var w = world.getTile(x - 1, y) || 0;
         var e = world.getTile(x + 1, y) || 0;
         if (w !== 0 && e !== 0 && w !== e) {
-          connectors.push({x: x, y: y});
+          connectors.push({x: x, y: y, c1: w, c2: e});
         }
         var n = world.getTile(x, y - 1) || 0;
         var s = world.getTile(x, y + 1) || 0;
         if (n !== 0 && s !== 0 && n !== s) {
-          connectors.push({x: x, y: y});
+          connectors.push({x: x, y: y, c1: n, c2: s});
         }
       }
     }
