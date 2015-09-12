@@ -1,6 +1,5 @@
 (function () {
     'use strict';
-
     var CANVAS_WIDTH = 400;
     var CANVAS_HEIGHT = 400;
 
@@ -33,48 +32,42 @@
             this.ctx.fillStyle = this.TILES[(colour % 5) + 1];
         }
         this.ctx.fillRect(x * this.tile_w + 1, y * this.tile_h - 1, this.tile_w - 1, this.tile_h - 1);
+    };
+
+    function World(containerDiv, xsize, ysize) {
+        this.stage = initStage(xsize, ysize);
+        this.y_max = this.stage.length;
+        this.x_max = this.stage[0].length;
+        this.graphics = new Graphics(containerDiv);
     }
 
-    var worldConstructor = function (containerDiv, xsize, ysize) {
-        var stage = initStage(xsize, ysize);
-
-        function initStage(x, y) {
-            var stage =  new Array(y);
-            for(var i = 0; i < y; i++) {
-                stage[i] = [];
-                for(var j = 0; j < y; j++) {
-                    stage[i].push(0);
-                }
-            }
-            return stage;
+    World.prototype.getTile = function (x, y) {
+        if (this.stage[y] === undefined || this.stage[y][x] === undefined) {
+            return false;
+        } else {
+            return this.stage[y][x];
         }
-
-        var world = {
-                getTile: function (x, y) {
-                if (this.stage[y] === undefined || this.stage[y][x] === undefined) {
-                    return false;
-                } else {
-                    return this.stage[y][x];
-                }
-            },
-
-            render: function () {
-                for(var y = 0; y < this.y_max; y++) {
-                    for(var x = 0; x < this.x_max; x++) {
-                        var tile = this.stage[y][x];
-                        this.graphics.drawTile(x, y, tile);
-                    }
-                }
-            }
-        };
-
-        var newWorld = Object.create(world);
-        newWorld.y_max = stage.length;
-        newWorld.x_max = stage[0].length;
-        newWorld.stage = stage;
-        newWorld.graphics = new Graphics(containerDiv);
-        return newWorld;
     };
+
+    World.prototype.render = function () {
+        for(var y = 0; y < this.y_max; y++) {
+            for(var x = 0; x < this.x_max; x++) {
+                var tile = this.stage[y][x];
+                this.graphics.drawTile(x, y, tile);
+            }
+        }
+    };
+
+    function initStage(x, y) {
+        var stage =  new Array(y);
+        for(var i = 0; i < y; i++) {
+            stage[i] = [];
+            for(var j = 0; j < y; j++) {
+                stage[i].push(0);
+            }
+        }
+        return stage;
+    }
 
     var roomBuilderConstructor = function (world, attempts) {
 
@@ -437,7 +430,7 @@
 
     DungeonGen.prototype.generate = function (containerDiv, options) {
         options = options ? options : this.defaults;
-        var world = worldConstructor(containerDiv, options.size_x, options.size_y);
+        var world = new World(containerDiv, options.size_x, options.size_y);
         var roomBuilder = roomBuilderConstructor(world, options.roomTries);
         roomBuilder.placeRooms();
         world.passages = carvePassages(world);
