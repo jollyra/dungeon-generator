@@ -1,47 +1,39 @@
 (function () {
     'use strict';
 
-    function initCanvas(containerDiv) {
-        var CANVAS_WIDTH = 400;
-        var CANVAS_HEIGHT = 400;
-        return (function () {
-            var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'" + "class='" + "dungeon-generator'>" + "</canvas>");
-            var ctx = canvas.get(0).getContext("2d");
-            canvas.appendTo($(containerDiv));
-            return ctx;
-        }) ();
+    var CANVAS_WIDTH = 400;
+    var CANVAS_HEIGHT = 400;
+
+    function Graphics(containerDiv) {
+        this.containerDiv = containerDiv;
+        this.tile_w = 10;
+        this.tile_h = 10;
+        this.TILES = {
+            0: "#333300",  // Rock
+            1: "#1b85b8",
+            2: "#c8cb77",
+            3: "#559e83",
+            4: "#ae5a41",
+            5: "#c3cb71"
+        };
+        // Init canvas
+        var canvas = $("<canvas width='" + CANVAS_WIDTH + "' height='" + CANVAS_HEIGHT + "'" + "class='" + "dungeon-generator'>" + "</canvas>");
+        this.ctx = canvas.get(0).getContext("2d");
+        canvas.appendTo($(containerDiv));
     }
 
-    var graphicsConstructor = function (containerDiv) {
-        var graphics = {
-            drawTile: function (x, y, colour) {
-                var tile_w = 10;
-                var tile_h = 10;
-                var TILES = {
-                    0: "#333300",  // Rock
-                    1: "#1b85b8",
-                    2: "#c8cb77",
-                    3: "#559e83",
-                    4: "#ae5a41",
-                    5: "#c3cb71"
-                };
-                // Draw a border around each tile.
-                this.ctx.fillStyle = "#000000";
-                this.ctx.fillRect(x * tile_w, y * tile_h, tile_w, tile_h);
-                // Draw the tile over the border tile.
-                if (colour === 0) {
-                    this.ctx.fillStyle = TILES[colour];
-                } else {
-                    this.ctx.fillStyle = TILES[(colour % 5) + 1];
-                }
-                this.ctx.fillRect(x * tile_w + 1, y * tile_h - 1, tile_w - 1, tile_h - 1);
-            }
-        };
-
-        var newGraphics = Object.create(graphics);
-        newGraphics.ctx = initCanvas(containerDiv);
-        return newGraphics;
-    };
+    Graphics.prototype.drawTile = function (x, y, colour) {
+        // Draw a border around each tile.
+        this.ctx.fillStyle = "#000000";
+        this.ctx.fillRect(x * this.tile_w, y * this.tile_h, this.tile_w, this.tile_h);
+        // Draw the tile over the border tile.
+        if (colour === 0) {
+            this.ctx.fillStyle = this.TILES[colour];
+        } else {
+            this.ctx.fillStyle = this.TILES[(colour % 5) + 1];
+        }
+        this.ctx.fillRect(x * this.tile_w + 1, y * this.tile_h - 1, this.tile_w - 1, this.tile_h - 1);
+    }
 
     var worldConstructor = function (containerDiv, xsize, ysize) {
         var stage = initStage(xsize, ysize);
@@ -80,7 +72,7 @@
         newWorld.y_max = stage.length;
         newWorld.x_max = stage[0].length;
         newWorld.stage = stage;
-        newWorld.graphics = graphicsConstructor(containerDiv);
+        newWorld.graphics = new Graphics(containerDiv);
         return newWorld;
     };
 
