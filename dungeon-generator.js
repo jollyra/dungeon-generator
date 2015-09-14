@@ -69,72 +69,65 @@
         return stage;
     }
 
-    var roomBuilderConstructor = function (world, attempts) {
+    function RoomBuilder(world, attempts) {
+        this.world = world;
+        this.attempts = attempts;
+        this.rooms = [];
+    }
 
-        var roomBuilder = {
-            digRoom: function (world, room) {
-                for(var y = room.y; y <= room.y + room.h; y++) {
-                    for(var x = room.x; x <= room.x + room.w; x++) {
-                        world.stage[y][x] = room.colour;
-                    }
+    RoomBuilder.prototype.checkRoomCollisions = function (world, room) {
+        var roomWithPadding = {};
+        roomWithPadding.x = room.x;
+        roomWithPadding.y = room.y;
+        roomWithPadding.h = room.h;
+        roomWithPadding.w = room.w;
+        for(var y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
+            for(var x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
+                if(x >= world.x_max || y >= world.y_max) {
+                    throw new Error('Oi! That\'s out of bounds!', x, y);
                 }
-            },
-
-            checkRoomCollisions: function (world, room) {
-                var roomWithPadding = {};
-                roomWithPadding.x = room.x;
-                roomWithPadding.y = room.y;
-                roomWithPadding.h = room.h;
-                roomWithPadding.w = room.w;
-                for(var y = roomWithPadding.y; y <= roomWithPadding.y + roomWithPadding.h; y++) {
-                    for(var x = roomWithPadding.x; x <= roomWithPadding.x + roomWithPadding.w; x++) {
-                        if(x >= world.x_max || y >= world.y_max) {
-                            throw new Error('Oi! That\'s out of bounds!', x, y);
-                        }
-                        if (world.stage[y][x] !== 0) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            },
-
-            randomRoom: function (world) {
-                var MAX_WIDTH = 15; // if odd will use the previous even number
-                var MAX_HEIGHT = 15;
-                var MIN_WIDTH = 3;
-                var MIN_HEIGHT = 3;
-                var h = evenize(_.random(MIN_HEIGHT, MAX_HEIGHT));
-                var w = evenize(_.random(MIN_WIDTH, MAX_WIDTH));
-                var x = oddRng(1, world.x_max - w - 1);
-                var y = oddRng(1, world.y_max - h - 1);
-                var room = { h: h, w: w, x: x, y: y };
-                if (x + w >= world.x_max || y + h >= world.y_max) {
-                    throw new Error('Oi! That room is too big.', room);
-                }
-                return room;
-            },
-
-            placeRooms: function () {
-                for (var i = 0; i < this.attempts; i++) {
-                    var room = this.randomRoom(this.world);
-                    if (this.checkRoomCollisions(this.world, room) === false) {
-                        room.colour = colourGenerator.next();
-                        this.digRoom(this.world, room);
-                        this.rooms.push(room);
-                    }
+                if (world.stage[y][x] !== 0) {
+                    return true;
                 }
             }
-
-        };
-
-        var newRoomBuilder = Object.create(roomBuilder);
-        newRoomBuilder.world = world;
-        newRoomBuilder.attempts = attempts;
-        newRoomBuilder.rooms = [];
-        return newRoomBuilder;
+        }
+        return false;
     };
 
+    RoomBuilder.prototype.randomRoom = function (world) {
+        var MAX_WIDTH = 15; // if odd will use the previous even number
+        var MAX_HEIGHT = 15;
+        var MIN_WIDTH = 3;
+        var MIN_HEIGHT = 3;
+        var h = evenize(_.random(MIN_HEIGHT, MAX_HEIGHT));
+        var w = evenize(_.random(MIN_WIDTH, MAX_WIDTH));
+        var x = oddRng(1, world.x_max - w - 1);
+        var y = oddRng(1, world.y_max - h - 1);
+        var room = { h: h, w: w, x: x, y: y };
+        if (x + w >= world.x_max || y + h >= world.y_max) {
+            throw new Error('Oi! That room is too big.', room);
+        }
+        return room;
+    };
+
+    RoomBuilder.prototype.placeRooms = function () {
+        for (var i = 0; i < this.attempts; i++) {
+            var room = this.randomRoom(this.world);
+            if (this.checkRoomCollisions(this.world, room) === false) {
+                room.colour = colourGenerator.next();
+                this.digRoom(this.world, room);
+                this.rooms.push(room);
+            }
+        }
+    };
+
+    RoomBuilder.prototype.digRoom = function (world, room) {
+        for(var y = room.y; y <= room.y + room.h; y++) {
+            for(var x = room.x; x <= room.x + room.w; x++) {
+                world.stage[y][x] = room.colour;
+            }
+        }
+    };
 
     function findStartingTile(world) {
         for (var y = 0; y < world.y_max; y++) {
@@ -431,7 +424,7 @@
     DungeonGen.prototype.generate = function (containerDiv, options) {
         options = options ? options : this.defaults;
         var world = new World(containerDiv, options.size_x, options.size_y);
-        var roomBuilder = roomBuilderConstructor(world, options.roomTries);
+        var roomBuilder = new RoomBuilder(world, options.roomTries);
         roomBuilder.placeRooms();
         world.passages = carvePassages(world);
         connectDungeon(world, roomBuilder.rooms);
