@@ -149,6 +149,7 @@
         var stack = [];
         stack.push({x: x0, y: y0});
         var colour = colourGenerator.next();
+        var prev = _.shuffle([pushRight, pushLeft, pushUp, pushDown])[0];
 
         function delveDeeper() {
             if (stack.length > 0) {
@@ -158,7 +159,12 @@
                 }
                 world.stage[tile.y][tile.x] = colour;
                 _.forEach(_.shuffle([pushRight, pushLeft, pushUp, pushDown]), function (direction) {
-                    direction(tile.x, tile.y);
+                    oneIn(2, function () {
+                        prev();
+                    }, function () {
+                        direction(tile.x, tile.y);
+                        prev = direction;
+                    });
                 });
                 return false;
             } else {    // Send a signal to the game loop to stop
@@ -397,6 +403,14 @@
     function evenize(x) {
         if (x === 0) { return x; }
         return _.floor(x / 2) * 2;
+    }
+
+    function oneIn(num, winCallback, loseCallback) {
+       if (_.random(1, num) % num === 0) {
+           return winCallback();
+       } else {
+           return loseCallback();
+       }
     }
 
     var colourGenerator = {
