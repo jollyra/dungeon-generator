@@ -129,6 +129,7 @@
         }
     };
 
+    /* Passage carving */
     function findStartingTile(world) {
         for (var y = 0; y < world.y_max; y++) {
             for (var x = 0; x < world.x_max; x++) {
@@ -145,79 +146,24 @@
         }
     }
 
-    function passageCarver(world, x0, y0) {
-        var stack = [];
-        stack.push({x: x0, y: y0});
-        var colour = colourGenerator.next();
-        var prev = _.shuffle([pushRight, pushLeft, pushUp, pushDown])[0];
-
-        function delveDeeper() {
-            if (stack.length > 0) {
-                var tile = stack.pop();
-                if (canDig(world, tile.x, tile.y) === false) {
-                    return false;
-                }
+    function randomFloodFill(world, x0, y0) {
+        var stack = [{x: x0, y: y0}],
+            colour = colourGenerator.next(),
+            clone = _.cloneDeep(world.stage),
+            tile;
+        while (stack.length > 0) {
+            tile = stack.pop();
+            if (canDig(world, tile.x, tile.y)) {
+                clone[tile.x][tile.y] = 'visited';
                 world.stage[tile.y][tile.x] = colour;
-                _.forEach(_.shuffle([pushRight, pushLeft, pushUp, pushDown]), function (direction) {
-                    oneIn(2, function () {
-                        prev();
-                    }, function () {
-                        direction(tile.x, tile.y);
-                        prev = direction;
-                    });
-                });
-                return false;
-            } else {    // Send a signal to the game loop to stop
-                return true;
             }
+            _.forEach([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x, y: tile.y - 1}], function (t) {
+                if (canDig(world, t.x, t.y) && clone[t.x][t.y] !== 'visited') {
+                    stack.push(t);
+                    clone[t.x][t.y] = 'visited';
+                }
+            });
         }
-
-        function pushRight(x, y) {
-            if (canDig(world, x + 1, y)) {
-                stack.push({x: x + 1, y: y});
-            }
-        }
-
-        function pushLeft(x, y) {
-            if (canDig(world, x - 1, y)) {
-                stack.push({x: x - 1, y: y});
-            }
-        }
-
-        function pushUp(x, y) {
-            if (canDig(world, x, y - 1)) {
-                stack.push({x: x, y: y - 1});
-            }
-        }
-
-        function pushDown(x, y) {
-            if (canDig(world, x, y + 1)) {
-                stack.push({x: x, y: y + 1});
-            }
-        }
-
-        function animate() {
-            function timeout() {
-                var done;
-                setTimeout(function () {
-                    done = delveDeeper();
-                    world.render();
-                    if (!done) {
-                        timeout();
-                    }
-                }, 0);
-            }
-            timeout();
-        }
-
-        function quickRender() {
-            var done;
-            while (!done) {
-                done = delveDeeper();
-            }
-        }
-
-        quickRender();
     }
 
     // Return the starting points of all passages created
@@ -226,7 +172,7 @@
         function fn() {
             var tile = findStartingTile(world);
             if (tile) {
-                passageCarver(world, tile.x, tile.y);
+                randomFloodFill(world, tile.x, tile.y);
                 tile.colour = world.stage[tile.y][tile.x];
                 passages.push(tile);
                 fn(world);
@@ -439,11 +385,11 @@
         options = options ? options : this.defaults;
         var world = new World(containerDiv, options.size_x, options.size_y);
         var roomBuilder = new RoomBuilder(world, options.roomTries);
-        roomBuilder.placeRooms();
-        world.passages = carvePassages(world);
-        connectDungeon(world, roomBuilder.rooms);
-        world.render();
-        makeGraphSparse(world);
+        //roomBuilder.placeRooms();
+        //world.passages = carvePassages(world);
+        randomFloodFill(world, 0, 0);
+        //connectDungeon(world, roomBuilder.rooms);
+        //makeGraphSparse(world);
         world.render();
     };
 
