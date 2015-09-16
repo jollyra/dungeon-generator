@@ -164,20 +164,19 @@
                 }
             });
         }
+        return {x: x0, y: y0, colour: colour};
     }
 
     // Return the starting points of all passages created
     function carvePassages(world) {
         var passages = [];
-        function fn() {
+        (function fn() {
             var tile = findStartingTile(world);
             if (tile) {
-                randomFloodFill(world, tile.x, tile.y);
-                tile.colour = world.stage[tile.y][tile.x];
-                passages.push(tile);
-                fn(world);
+                passages.push(randomFloodFill(world, tile.x, tile.y));
+                fn();
             }
-        } fn(world);
+        }) ();
         return passages;
     }
 
@@ -385,10 +384,10 @@
         options = options ? options : this.defaults;
         var world = new World(containerDiv, options.size_x, options.size_y);
         var roomBuilder = new RoomBuilder(world, options.roomTries);
-        //roomBuilder.placeRooms();
-        //world.passages = carvePassages(world);
+        roomBuilder.placeRooms();
+        world.passages = carvePassages(world);
         randomFloodFill(world, 0, 0);
-        //connectDungeon(world, roomBuilder.rooms);
+        connectDungeon(world, roomBuilder.rooms);
         //makeGraphSparse(world);
         world.render();
     };
