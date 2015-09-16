@@ -157,7 +157,7 @@
                 clone[tile.x][tile.y] = 'visited';
                 world.stage[tile.y][tile.x] = colour;
             }
-            _.forEach([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x, y: tile.y - 1}], function (t) {
+            _.forEach(_.shuffle([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x, y: tile.y - 1}]), function (t) {
                 if (canDig(world, t.x, t.y) && clone[t.x][t.y] !== 'visited') {
                     stack.push(t);
                     clone[t.x][t.y] = 'visited';
@@ -388,7 +388,7 @@
         world.passages = carvePassages(world);
         randomFloodFill(world, 0, 0);
         connectDungeon(world, roomBuilder.rooms);
-        //makeGraphSparse(world);
+        makeGraphSparse(world);
         world.render();
     };
 
