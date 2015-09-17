@@ -146,25 +146,47 @@
         }
     }
 
-    function randomFloodFill(world, x0, y0) {
-        var stack = [{x: x0, y: y0}],
+    // Maze generating algorithm for carving passages
+    function randomFloodFill(world, x0, y0, windiness) {
+        var stack = [{x: x0, y: y0, d: 'n'}],
             colour = colourGenerator.next(),
             clone = _.cloneDeep(world.stage),
             tile;
+
+        var directions = {
+            n: function (tile) { return {x: tile.x, y: tile.y - 1, d: 'n'}; },
+            e: function (tile) { return {x: tile.x + 1, y: tile.y, d: 'e'}; },
+            s: function (tile) { return {x: tile.x, y: tile.y + 1, d: 's'}; },
+            w: function (tile) { return {x: tile.x - 1, y: tile.y, d: 'w'}; },
+        };
+
         while (stack.length > 0) {
             tile = stack.pop();
             if (canDig(world, tile.x, tile.y)) {
                 clone[tile.x][tile.y] = 'visited';
                 world.stage[tile.y][tile.x] = colour;
             }
-            _.forEach(_.shuffle([{x: tile.x + 1, y: tile.y}, {x: tile.x - 1, y: tile.y}, {x: tile.x, y: tile.y + 1}, {x: tile.x, y: tile.y - 1}]), function (t) {
+            _.forEach(_.shuffle([directions.n(tile), directions.e(tile), directions.s(tile), directions.w(tile)]), function (t) {
                 if (canDig(world, t.x, t.y) && clone[t.x][t.y] !== 'visited') {
                     stack.push(t);
                     clone[t.x][t.y] = 'visited';
                 }
             });
+
+            // Make maze less windy
+            if (_.random(1, 4) > 1) {  // There' a 75% chance the passage continues the same way
+                stack.push(directions[tile.d](tile));
+            }
         }
         return {x: x0, y: y0, colour: colour};
+    }
+
+    function oneIn(num, winCallback, loseCallback) {
+       if (_.random(1, num) % num === 0) {
+           return winCallback();
+       } else {
+           return loseCallback();
+       }
     }
 
     // Return the starting points of all passages created
@@ -350,14 +372,6 @@
         return _.floor(x / 2) * 2;
     }
 
-    function oneIn(num, winCallback, loseCallback) {
-       if (_.random(1, num) % num === 0) {
-           return winCallback();
-       } else {
-           return loseCallback();
-       }
-    }
-
     var colourGenerator = {
         count: 0,
         colours: [],
@@ -373,7 +387,7 @@
         this.defaults = {
             size_x: 40,
             size_y: 40,
-            roomTries: 20,
+            roomTries: 50,
             windyness: 0,
             connectedness: 0,
             deadendedness: 0
