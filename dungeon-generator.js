@@ -174,7 +174,7 @@
             });
 
             // Make maze less windy
-            if (_.random(1, 4) > 1) {  // There' a 75% chance the passage continues the same way
+            if (_.random(1, windiness) < windiness) {  // There' a 75% chance the passage continues the same way
                 stack.push(directions[tile.d](tile));
             }
         }
@@ -182,12 +182,12 @@
     }
 
     // Return the starting points of all passages created
-    function carvePassages(world) {
+    function carvePassages(world, windiness) {
         var passages = [];
         (function fn() {
             var tile = findStartingTile(world);
             if (tile) {
-                passages.push(randomFloodFill(world, tile.x, tile.y));
+                passages.push(randomFloodFill(world, tile.x, tile.y, windiness));
                 fn();
             }
         }) ();
@@ -380,7 +380,7 @@
             size_x: 40,
             size_y: 40,
             roomTries: 50,
-            windyness: 0,
+            windiness: 8,
             connectedness: 0,
             deadendedness: 0
         };
@@ -391,8 +391,7 @@
         var world = new World(containerDiv, options.size_x, options.size_y);
         var roomBuilder = new RoomBuilder(world, options.roomTries);
         roomBuilder.placeRooms();
-        world.passages = carvePassages(world);
-        randomFloodFill(world, 0, 0);
+        world.passages = carvePassages(world, options.windiness);
         connectDungeon(world, roomBuilder.rooms);
         makeGraphSparse(world);
         world.render();
