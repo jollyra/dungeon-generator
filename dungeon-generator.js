@@ -181,14 +181,6 @@
         return {x: x0, y: y0, colour: colour};
     }
 
-    function oneIn(num, winCallback, loseCallback) {
-       if (_.random(1, num) % num === 0) {
-           return winCallback();
-       } else {
-           return loseCallback();
-       }
-    }
-
     // Return the starting points of all passages created
     function carvePassages(world) {
         var passages = [];
