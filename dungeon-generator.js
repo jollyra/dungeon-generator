@@ -218,7 +218,7 @@
         return tiles;
     }
 
-    function connectDungeon(world, rooms) {
+    function connectDungeon_old(world, rooms) {
         var connectors = findAllConnectors(world);
         // Place all connectors in the dungeon
         _.each(connectors, function (connector) {
@@ -239,13 +239,16 @@
         }
     }
 
-    function connectDungeon_New(world, rooms) {
+    function connectDungeon(world, rooms) {
         var connectors = findAllConnectors(world);
         // Remove connectors until we have an MSP
         connectors = _.shuffle(connectors);
         var connector;
         var connectedRegions = floodFill(world, connectors[connectors.length - 1]);
+        var counter = 0;
         while(connectors.length > 0) {
+            console.log(connectors.length);
+            if (counter++ > 1000) return;
             connector = connectors[connectors.length - 1];
             if (isConnected(connectors, colourGenerator.colours)) {
                 connectors.pop();
@@ -258,7 +261,7 @@
     }
 
     function isConnected(connectors, nodes) {
-        console.log(nodes);
+        // TODO: the c1, c2 pluck inclusion algorithm won't work
     }
 
     function findAllConnectors(world) {
@@ -393,7 +396,7 @@
         roomBuilder.placeRooms();
         world.passages = carvePassages(world, options.windiness);
         connectDungeon(world, roomBuilder.rooms);
-        makeGraphSparse(world);
+        //makeGraphSparse(world);
         world.render();
     };
 
