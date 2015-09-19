@@ -241,27 +241,24 @@
 
     function connectDungeon(world, rooms) {
         var connectors = findAllConnectors(world);
-        // Remove connectors until we have an MSP
         connectors = _.shuffle(connectors);
-        var connector;
-        var connectedRegions = floodFill(world, connectors[connectors.length - 1]);
-        var counter = 0;
+        var graph;
         while(connectors.length > 0) {
-            console.log(connectors.length);
-            if (counter++ > 1000) return;
-            connector = connectors[connectors.length - 1];
-            if (isConnected(connectors, colourGenerator.colours)) {
-                connectors.pop();
-            }
+            graph = addConnector(graph, connectors.pop());
         }
+
         // Place all connectors that we chose
         _.each(connectors, function (connector) {
             world.stage[connector.y][connector.x] = 1001;
         });
     }
 
-    function isConnected(connectors, nodes) {
-        // TODO: the c1, c2 pluck inclusion algorithm won't work
+    /**
+     * graph if a list of all the connected nodes
+     * nodes refer to single colours or groups of colours
+     */
+    function addConnector(graph, connector) {
+        // TODO;
     }
 
     function findAllConnectors(world) {
