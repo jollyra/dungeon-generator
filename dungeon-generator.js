@@ -242,9 +242,9 @@
     function connectDungeon(world, rooms) {
         var connectors = findAllConnectors(world);
         connectors = _.shuffle(connectors);
-        var graph;
+        var forest;
         while(connectors.length > 0) {
-            graph = addConnector(graph, connectors.pop());
+            forest = addConnector(forest, connectors.pop());
         }
 
         // Place all connectors that we chose
@@ -257,8 +257,17 @@
      * graph if a list of all the connected nodes
      * nodes refer to single colours or groups of colours
      */
-    function addConnector(graph, connector) {
-        // TODO;
+    function addConnector(forest, connector) {
+        colourGenerator.count;
+        var c1 = connector.c1;
+        var c2 = connector.c2;
+        console.log(connector);
+
+        _.forEach(forest, function (graph) {
+            _.forEach(graph, function (node) {
+
+            });
+        });
     }
 
     function findAllConnectors(world) {
