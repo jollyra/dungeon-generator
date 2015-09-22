@@ -256,6 +256,12 @@
     /**
      * graph if a list of all the connected nodes
      * nodes refer to single colours or groups of colours
+     * Example forest: [[1,2], [3], [4,5,6]]
+     * When adding a connector there are 3 cases:
+     * 1. c1 and c2 are in no graphs -> add a new graph to the forest
+     * 2. c1 and c2 are both in the forest -> discard connector
+     * 3. c1 is in graph G and c2 is not -> add connector and add c2 to G
+     * 4. c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
      */
     function addConnector(forest, connector) {
         colourGenerator.count;
