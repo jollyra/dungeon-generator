@@ -239,20 +239,6 @@
         }
     }
 
-    function connectDungeon(world, rooms) {
-        var connectors = findAllConnectors(world);
-        connectors = _.shuffle(connectors);
-        var forest;
-        while(connectors.length > 0) {
-            forest = addConnector(forest, connectors.pop());
-        }
-
-        // Place all connectors that we chose
-        _.each(connectors, function (connector) {
-            world.stage[connector.y][connector.x] = 1001;
-        });
-    }
-
     /**
      * graph if a list of all the connected nodes
      * nodes refer to single colours or groups of colours
@@ -263,16 +249,35 @@
      * 3. c1 is in graph G and c2 is not -> add connector and add c2 to G
      * 4. c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
      */
-    function addConnector(forest, connector) {
-        colourGenerator.count;
-        var c1 = connector.c1;
-        var c2 = connector.c2;
-        console.log(connector);
+    function connectDungeon(world, rooms) {
+        var connectors = findAllConnectors(world);
+        connectors = _.shuffle(connectors);
+        var forest;
+        while(connectors.length > 0) {
+			var c = connector.pop();
+			var indexC1 = [];
+			var indexC2 = [];
+			_.forEach(forest, function (graph) {
+				if (_.indexOf(graph, c.c1) >= 0) {
+					indexC1.push(1);
+				} else {
+					indexC1.push(0);
+				}
 
-        _.forEach(forest, function (graph) {
-            _.forEach(graph, function (node) {
+				if (_.indexOf(graph, c.c2) >= 0) {
+					indexC2.push(1);
+				} else {
+					indexC2.push(0);
+				}
+			});
+			for (var i = 0; i < indexC1.length - 1; i++) {
+				if (
+			}
+        }
 
-            });
+        // Place all connectors that we chose
+        _.each(connectors, function (connector) {
+            world.stage[connector.y][connector.x] = 1001;
         });
     }
 
