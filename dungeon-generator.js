@@ -254,25 +254,26 @@
         connectors = _.shuffle(connectors);
         var forest;
         while(connectors.length > 0) {
-			var c = connector.pop();
-			var indexC1 = [];
-			var indexC2 = [];
-			_.forEach(forest, function (graph) {
-				if (_.indexOf(graph, c.c1) >= 0) {
-					indexC1.push(1);
-				} else {
-					indexC1.push(0);
-				}
+            var c = connector.pop();
+            var indexC1 = [];
+            var indexC2 = [];
+            _.forEach(forest, function (graph) {
+                var i1 = _.indexOf(graph, c.c1);
+                if (i1 >= 0) {
+                    indexC1.push(i1);
+                }
+                var i2 = _.indexOf(graph, c.c2);
+                if (i2 >= 0) {
+                    indexC1.push(i2);
+                }
+            });
+        }
 
-				if (_.indexOf(graph, c.c2) >= 0) {
-					indexC2.push(1);
-				} else {
-					indexC2.push(0);
-				}
-			});
-			for (var i = 0; i < indexC1.length - 1; i++) {
-				if (
-			}
+        for (var j = 0; j < indexC1; i++) {
+            if (indexC1.length === 0 && indexC2.length === 0) {
+                // 1. c1 and c2 are in no graphs -> add a new graph to the forest
+                forest.push([c.c1, c.c2]);
+            }
         }
 
         // Place all connectors that we chose
