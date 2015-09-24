@@ -2,7 +2,7 @@
 
 An implementation of Bob Nystrom's [dungeon generation algorithm](http://journal.stuffwithstuff.com/2014/12/21/rooms-and-mazes/).
 
-Try it! http://jollyra.github.io/procedural-dungeon-generator
+Try it! http://jollyra.github.io/dungeon-generator
 
 1. Randomly place some rooms
 2. Fill the remaining space with a maze
