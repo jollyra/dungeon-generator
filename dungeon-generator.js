@@ -253,6 +253,7 @@
         var connectors = findAllConnectors(world);
         connectors = _.shuffle(connectors);
         var forest;
+
         while(connectors.length > 0) {
             var c = connector.pop();
             var indexC1 = [];
@@ -267,24 +268,25 @@
                     indexC1.push(i2);
                 }
             });
-        }
 
-        for (var j = 0; j < indexC1; i++) {
-            if (indexC1.length === 0 && indexC2.length === 0) {
-                // c1 and c2 are in no graphs -> add a new graph to the forest
-                forest.push([c.c1, c.c2]);
-            } else if (indexC1.length === 0 && indexC2.length >= 0) {
-                // c1 is in graph G and c2 is not -> add connector and add c2 to G
-            } else if (indexC2.length === 0 && indexC1.length >= 0) {
-                // c2 is in graph G and c1 is not -> add connector and add c1 to G
-            } else if (indexC1.length >= 0 && indexC2.length >= 0) {
-                if (indexC1[0] === indexC2[0]) {
-                   // c1 and c2 are both in the forest -> discard connector
+            for (var j = 0; j < indexC1; i++) {
+                if (indexC1.length === 0 && indexC2.length === 0) {
+                    // c1 and c2 are in no graphs -> add a new graph to the forest
+                    forest.push([c.c1, c.c2]);
+                } else if (indexC1.length === 0 && indexC2.length >= 0) {
+                    // c1 is in graph G and c2 is not -> add connector and add c2 to G
+                    forest[indexC2[0]].push(c.c1);
+                } else if (indexC2.length === 0 && indexC1.length >= 0) {
+                    // c2 is in graph G and c1 is not -> add connector and add c1 to G
+                } else if (indexC1.length >= 0 && indexC2.length >= 0) {
+                    if (indexC1[0] === indexC2[0]) {
+                       // c1 and c2 are both in the forest -> discard connector
+                    } else {
+                       // c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
+                    }
                 } else {
-                   // c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
+                    throw new Error('Uhh... where are we?');
                 }
-            } else {
-                throw new Error('Uhh... where are we?');
             }
         }
 
