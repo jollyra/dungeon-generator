@@ -249,44 +249,42 @@
      * 3. c1 is in graph G and c2 is not -> add connector and add c2 to G
      * 4. c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
      */
-    function connectDungeon(world, rooms) {
+    function connectDungeon(world) {
         var connectors = findAllConnectors(world);
         connectors = _.shuffle(connectors);
         var forest;
 
         while(connectors.length > 0) {
-            var c = connector.pop();
-            var indexC1 = [];
-            var indexC2 = [];
+            var c = connectors.pop(),
+                whereisC1 = -1,
+                whereisC2 = -1;
             _.forEach(forest, function (graph) {
                 var i1 = _.indexOf(graph, c.c1);
                 if (i1 >= 0) {
-                    indexC1.push(i1);
+                    whereisC1 = i1;
                 }
                 var i2 = _.indexOf(graph, c.c2);
                 if (i2 >= 0) {
-                    indexC1.push(i2);
+                    whereisC2 = i2;
                 }
             });
 
-            for (var j = 0; j < indexC1; i++) {
-                if (indexC1.length === 0 && indexC2.length === 0) {
-                    // c1 and c2 are in no graphs -> add a new graph to the forest
-                    forest.push([c.c1, c.c2]);
-                } else if (indexC1.length === 0 && indexC2.length >= 0) {
-                    // c1 is in graph G and c2 is not -> add connector and add c2 to G
-                    forest[indexC2[0]].push(c.c1);
-                } else if (indexC2.length === 0 && indexC1.length >= 0) {
-                    // c2 is in graph G and c1 is not -> add connector and add c1 to G
-                } else if (indexC1.length >= 0 && indexC2.length >= 0) {
-                    if (indexC1[0] === indexC2[0]) {
-                       // c1 and c2 are both in the forest -> discard connector
-                    } else {
-                       // c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
-                    }
+            if (whereisC1 === -1 && whereisC2 === -1) {
+                // c1 and c2 are in no graphs -> add a new graph to the forest
+                forest.push([c.c1, c.c2]);
+            } else if (whereisC1 === -1 && whereisC2 >= 0) {
+                // c1 is in graph G and c2 is not -> add connector and add c2 to G
+                forest[whereisC2].push(c.c1);
+            } else if (whereisC2 === -1 && whereisC1 >= 0) {
+                // c2 is in graph G and c1 is not -> add connector and add c1 to G
+            } else if (whereisC1 >= 0 && whereisC2 >= 0) {
+                if (whereisC1 === whereisC2) {
+                   // c1 and c2 are both in the forest -> discard connector
                 } else {
-                    throw new Error('Uhh... where are we?');
+                   // c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
                 }
+            } else {
+                throw new Error('Uhh... where are we?');
             }
         }
 
