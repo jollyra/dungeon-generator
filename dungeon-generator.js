@@ -294,6 +294,18 @@
         });
     }
 
+    var f = [[1,2],[3,4],[5]];
+    function mergeGraphs(forest, indexOfG1, indexOfG2) {
+        var graph1 = _.cloneDeep(forest[indexOfG1]);
+        var graph2 = _.cloneDeep(forest[indexOfG2]);
+        _.forEach(graph1, function (node) { graph2.push(node); });
+        var newGraph = graph2;
+        // TODO: now remove old graphs from forest
+        var f = forest.splice(0, indexOfG1 + 1).pop();
+
+    }
+    mergeGraphs(f, 0, 1);
+
     function findAllConnectors(world) {
         var connectors = [];
         for (var y = 0; y < world.y_max; y++) {
