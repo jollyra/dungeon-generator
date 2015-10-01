@@ -252,7 +252,7 @@
     function connectDungeon(world) {
         var connectors = findAllConnectors(world);
         connectors = _.shuffle(connectors);
-        var forest;
+        var forest = [];
 
         while(connectors.length > 0) {
             var c = connectors.pop(),
@@ -278,11 +278,10 @@
             } else if (whereisC2 === -1 && whereisC1 >= 0) {
                 // c2 is in graph G and c1 is not -> add connector and add c1 to G
             } else if (whereisC1 >= 0 && whereisC2 >= 0) {
-                if (whereisC1 === whereisC2) {
-                   // c1 and c2 are both in the forest -> discard connector
-                } else {
+                if (whereisC1 !== whereisC2) {
                    // c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
-                }
+                   forest = joinGraphs(forest, whereisC1, whereisC2);
+                } // c1 and c2 are both in the forest -> discard connector
             } else {
                 throw new Error('Uhh... where are we?');
             }
@@ -294,17 +293,16 @@
         });
     }
 
-    var f = [[1,2],[3,4],[5]];
-    function mergeGraphs(forest, indexOfG1, indexOfG2) {
-        var graph1 = _.cloneDeep(forest[indexOfG1]);
-        var graph2 = _.cloneDeep(forest[indexOfG2]);
-        _.forEach(graph1, function (node) { graph2.push(node); });
-        var newGraph = graph2;
-        // TODO: now remove old graphs from forest
-        var f = forest.splice(0, indexOfG1 + 1).pop();
-
+    function joinGraphs(forest, indexOfG1, indexOfG2) {
+        var nodesToJoin = indexOfG1 > indexOfG2 ? [indexOfG2, indexOfG1] : [indexOfG1, indexOfG2];
+        var g1 = forest.splice(nodesToJoin.pop(), 1)[0];
+        var g2 = forest.splice(nodesToJoin.pop(), 1)[0];
+        _.forEach(g1, function (node) {  // Combine graphs
+            g2.push(node);
+        });
+        forest.push(g2);
+        return forest;
     }
-    mergeGraphs(f, 0, 1);
 
     function findAllConnectors(world) {
         var connectors = [];
@@ -437,7 +435,7 @@
         var roomBuilder = new RoomBuilder(world, options.roomTries);
         roomBuilder.placeRooms();
         world.passages = carvePassages(world, options.windiness);
-        connectDungeon(world, roomBuilder.rooms);
+       // connectDungeon(world, roomBuilder.rooms);
         //makeGraphSparse(world);
         world.render();
     };
