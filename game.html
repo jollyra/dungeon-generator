@@ -2,16 +2,20 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Game</title>
+		<title>Dungeon gen</title>
 		<style src="style/pcg.css"></style>
+    <link href="lib/mocha.css" rel="stylesheet"/>
 	</head>
 
 	<body>
     <div id='dungeon'></div>
 	</body>
 	<script src="lib/jquery-1.11.3.min.js"></script>
-	<script src="lib/lodash.js"></script>
+	<script src="lib/lodash.min.js"></script>
+	<script src="lib/expectjs/index.js"></script>
+	<script src="lib/mocha.js"></script>
 	<script type="text/javascript" src="dungeon-generator.js"></script>
+
 
 	<script type="text/javascript">
     dungeonGen.generate(dungeon);
