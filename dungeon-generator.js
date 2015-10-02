@@ -252,12 +252,17 @@
     function connectDungeon(world) {
         var connectors = findAllConnectors(world);
         connectors = _.shuffle(connectors);
-        var forest = [];
+
+        // Initialize forest with first connector
+        var c = connectors.pop();
+        var forest = [[c.c1, c.c2]];
+        console.log(forest);
 
         while(connectors.length > 0) {
-            var c = connectors.pop(),
-                whereisC1 = -1,
-                whereisC2 = -1;
+                var whereisC1 = -1;
+                var whereisC2 = -1;
+                c = connectors.pop(),
+
             _.forEach(forest, function (graph) {
                 var i1 = _.indexOf(graph, c.c1);
                 if (i1 >= 0) {
@@ -435,7 +440,7 @@
         var roomBuilder = new RoomBuilder(world, options.roomTries);
         roomBuilder.placeRooms();
         world.passages = carvePassages(world, options.windiness);
-       // connectDungeon(world, roomBuilder.rooms);
+        connectDungeon(world, roomBuilder.rooms);
         //makeGraphSparse(world);
         world.render();
     };
