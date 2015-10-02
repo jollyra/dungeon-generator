@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mocha</title>
+  <style src="style/pcg.css"></style>
+  <link href="lib/mocha.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+  <!-- Dependencies for mocha -->
+  <script src="lib/jquery-1.11.3.min.js"></script>
+  <script src="lib/expectjs/index.js"></script>
+  <script src="lib/mocha.js"></script>
+
+  <!-- Setup and run mocha tests -->
+  <div id="mocha"></div>
+  <script>mocha.setup('bdd')</script>
+  <script src="test/test.dungeon-generator.js"></script>
+  <script>
+    mocha.checkLeaks();
+    mocha.globals(['jQuery']);
+    mocha.run();
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dungeon gen</title>
+  <style src="style/pcg.css"></style>
+</head>
+
+<body>
+  <!-- Dependencies for dungeon-generator -->
+  <script src="lib/jquery-1.11.3.min.js"></script>
+  <script src="lib/lodash.min.js"></script>
+
+  <!-- Setup and generate dungeon -->
+  <div id='dungeon'></div>
+  <script type="text/javascript" src="dungeon-generator.js"></script>
+  <script type="text/javascript">
+    dungeonGen.generate(dungeon);
+  </script>
+</body>
+</html>
