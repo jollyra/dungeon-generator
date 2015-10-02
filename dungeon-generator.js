@@ -162,21 +162,21 @@
 
         while (stack.length > 0) {
             tile = stack.pop();
-            if (canDig(world, tile.x, tile.y)) {
+            if (canDig(world, tile.x, tile.y, colour)) {
                 clone[tile.x][tile.y] = 'visited';
                 world.stage[tile.y][tile.x] = colour;
             }
             _.forEach(_.shuffle([directions.n(tile), directions.e(tile), directions.s(tile), directions.w(tile)]), function (t) {
-                if (canDig(world, t.x, t.y) && clone[t.x][t.y] !== 'visited') {
+                if (canDig(world, t.x, t.y, colour) && clone[t.x][t.y] !== 'visited') {
                     stack.push(t);
                     clone[t.x][t.y] = 'visited';
                 }
             });
 
             // Make maze less windy
-            //if (_.random(1, windiness) < windiness) {
-             //   stack.push(directions[tile.d](tile));
-            //}
+            if (_.random(1, windiness) < windiness) {
+                stack.push(directions[tile.d](tile));
+            }
         }
         return {x: x0, y: y0, colour: colour};
     }
@@ -194,14 +194,17 @@
         return passages;
     }
 
-    function canDig(world, x, y) {
+    function canDig(world, x, y, colour) {
         if (world.stage[y] === undefined || world.stage[y][x] === undefined) {
             return false;
         }
         var adjacentStructures = 0;
         var adjacentTiles = calculateAdjacentTiles(x, y);
         _.forEach(adjacentTiles, function (tile) {
-            if (world.getTile(tile.x, tile.y) > 0) {    // Can't be adjacent to anything other that rock
+            //if (world.getTile(tile.x, tile.y) > 0 && world.getTile(tile.x, tile.y) !== colour) {
+            //    return false;
+            //}
+            if (world.getTile(tile.x, tile.y) > 0) {  // Can't be adjacent to anything other that rock
                 adjacentStructures = adjacentStructures + 1;
             }
         });
@@ -216,6 +219,15 @@
             }
         }
         return tiles;
+    }
+
+    function calculateAdjacentTiles_x4 (x0, y0) {
+        return [
+            {x: x0, y: y0 - 1},
+            {x: x0 + 1, y: y0},
+            {x: x0, y: y0 + 1},
+            {x: x0 - 1, y: y0}
+        ];
     }
 
     function connectDungeon_old(world, rooms) {
@@ -276,7 +288,6 @@
                 }
             }
 
-            console.log(whereisC1, whereisC2, c.c1, c.c2);
             if (whereisC1 === -1 && whereisC2 === -1) {
                 // c1 and c2 are in no graphs -> add a new graph to the forest
                 forest.push([c.c1, c.c2]);
@@ -387,12 +398,7 @@
     // deadends if there are 3 adjacent stone tiles.
     function isDeadEnd(world, tile) {
         var adjacentStoneTiles = 0;
-        _.forEach([
-                {x: tile.x + 1, y: tile.y},
-                {x: tile.x - 1, y: tile.y},
-                {x: tile.x, y: tile.y + 1},
-                {x: tile.x, y: tile.y - 1}
-        ], function (t) {
+        _.forEach(calculateAdjacentTiles_x4(tile.x, tile.y), function (t) {
             if (world.getTile(t.x, t.y) === 0 || world.getTile(t.x, t.y) === false) {
                 adjacentStoneTiles++;
             }
@@ -448,8 +454,8 @@
         var roomBuilder = new RoomBuilder(world, options.roomTries);
         roomBuilder.placeRooms();
         world.passages = carvePassages(world, options.windiness);
-        connectDungeon(world, roomBuilder.rooms);
-        makeGraphSparse(world);
+        //connectDungeon(world, roomBuilder.rooms);
+        //makeGraphSparse(world);
         world.render();
     };
 
