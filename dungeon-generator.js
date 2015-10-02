@@ -174,9 +174,9 @@
             });
 
             // Make maze less windy
-            if (_.random(1, windiness) < windiness) {  // There' a 75% chance the passage continues the same way
-                stack.push(directions[tile.d](tile));
-            }
+            //if (_.random(1, windiness) < windiness) {
+             //   stack.push(directions[tile.d](tile));
+            //}
         }
         return {x: x0, y: y0, colour: colour};
     }
@@ -252,40 +252,48 @@
     function connectDungeon(world) {
         var connectors = findAllConnectors(world);
         connectors = _.shuffle(connectors);
+        var chosenConnectors = [];
 
         // Initialize forest with first connector
         var c = connectors.pop();
-        var forest = [[c.c1, c.c2]];
-        console.log(forest);
+        var forest = [];
+        forest.push([c.c1, c.c2]);
+        chosenConnectors.push(c);
 
         while(connectors.length > 0) {
-                var whereisC1 = -1;
-                var whereisC2 = -1;
-                c = connectors.pop(),
+            var whereisC1 = -1;
+            var whereisC2 = -1;
+            c = connectors.pop();
 
-            _.forEach(forest, function (graph) {
-                var i1 = _.indexOf(graph, c.c1);
+            for (var i = 0; i < forest.length; i++) {
+                var i1 = _.indexOf(forest[i], c.c1);
                 if (i1 >= 0) {
-                    whereisC1 = i1;
+                    whereisC1 = i;
                 }
-                var i2 = _.indexOf(graph, c.c2);
+                var i2 = _.indexOf(forest[i], c.c2);
                 if (i2 >= 0) {
-                    whereisC2 = i2;
+                    whereisC2 = i;
                 }
-            });
+            }
 
+            console.log(whereisC1, whereisC2, c.c1, c.c2);
             if (whereisC1 === -1 && whereisC2 === -1) {
                 // c1 and c2 are in no graphs -> add a new graph to the forest
                 forest.push([c.c1, c.c2]);
+                chosenConnectors.push(c);
             } else if (whereisC1 === -1 && whereisC2 >= 0) {
                 // c1 is in graph G and c2 is not -> add connector and add c2 to G
                 forest[whereisC2].push(c.c1);
+                chosenConnectors.push(c);
             } else if (whereisC2 === -1 && whereisC1 >= 0) {
                 // c2 is in graph G and c1 is not -> add connector and add c1 to G
+                forest[whereisC1].push(c.c2);
+                chosenConnectors.push(c);
             } else if (whereisC1 >= 0 && whereisC2 >= 0) {
                 if (whereisC1 !== whereisC2) {
-                   // c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
-                   forest = joinGraphs(forest, whereisC1, whereisC2);
+                    // c1 is in graph G and c2 is in grapn G' -> add connector and combine forests in single graph
+                    forest = joinGraphs(forest, whereisC1, whereisC2);
+                    chosenConnectors.push(c);
                 } // c1 and c2 are both in the forest -> discard connector
             } else {
                 throw new Error('Uhh... where are we?');
@@ -293,7 +301,7 @@
         }
 
         // Place all connectors that we chose
-        _.each(connectors, function (connector) {
+        _.each(chosenConnectors, function (connector) {
             world.stage[connector.y][connector.x] = 1001;
         });
     }
@@ -428,7 +436,7 @@
             size_x: 40,
             size_y: 40,
             roomTries: 50,
-            windiness: 8,
+            windiness: 50,
             connectedness: 0,
             deadendedness: 0
         };
@@ -441,7 +449,7 @@
         roomBuilder.placeRooms();
         world.passages = carvePassages(world, options.windiness);
         connectDungeon(world, roomBuilder.rooms);
-        //makeGraphSparse(world);
+        makeGraphSparse(world);
         world.render();
     };
 
