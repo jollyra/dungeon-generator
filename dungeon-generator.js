@@ -459,5 +459,10 @@
         world.render();
     };
 
+    // Export for unit testing
+    DungeonGen.prototype._findAllConnectors = findAllConnectors;
+    DungeonGen.prototype._joinGraphs = joinGraphs;
+    DungeonGen.prototype._canDig = canDig;
+
     window.dungeonGen = new DungeonGen();
 })();

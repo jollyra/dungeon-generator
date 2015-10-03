@@ -8,15 +8,20 @@
 </head>
 
 <body>
+  <!-- Shared dependencies -->
+  <script src="lib/jquery-1.11.3.min.js"></script>
 
   <!-- Dependencies for mocha -->
-  <script src="lib/jquery-1.11.3.min.js"></script>
   <script src="lib/expectjs/index.js"></script>
   <script src="lib/mocha.js"></script>
+
+  <!-- Dependencies for dungeon-generator -->
+  <script src="lib/lodash.min.js"></script>
 
   <!-- Setup and run mocha tests -->
   <div id="mocha"></div>
   <script>mocha.setup('bdd')</script>
+  <script src="dungeon-generator.js"></script>
   <script src="test/test.dungeon-generator.js"></script>
   <script>
     mocha.checkLeaks();
