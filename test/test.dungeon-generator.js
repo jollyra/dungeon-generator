@@ -28,4 +28,21 @@ describe('dungeon generator', function() {
             expect(dungeonGen._joinGraphs(forest, g1, g2)).to.eql([[1,2],[5,6,7,8]]);
         });
     });
+
+    describe('#canDig(world, x, y, colour)', function() {
+        var testWorld = new dungeonGen._World('fakeDiv', 5, 5);
+        testWorld.stage = [
+            [1,1,1,1,1],
+            [0,0,0,0,0],
+            [0,0,0,0,0],
+            [0,0,0,0,0],
+            [0,0,0,0,0]
+        ];
+
+        it('should confirm diggable tile', function() {
+            console.log(testWorld);
+            var colour = 1;
+            expect(dungeonGen._canDig(testWorld, 1, 2, colour)).to.eql(true);
+        });
+    });
 });
