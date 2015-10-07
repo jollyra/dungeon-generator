@@ -201,9 +201,6 @@
         var adjacentStructures = 0;
         var adjacentTiles = calculateAdjacentTiles(x, y);
         _.forEach(adjacentTiles, function (tile) {
-            //if (world.getTile(tile.x, tile.y) > 0 && world.getTile(tile.x, tile.y) !== colour) {
-            //    return false;
-            //}
             if (world.getTile(tile.x, tile.y) > 0) {  // Can't be adjacent to anything other that rock
                 adjacentStructures = adjacentStructures + 1;
             }
