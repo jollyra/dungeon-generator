@@ -30,19 +30,46 @@ describe('dungeon generator', function() {
     });
 
     describe('#canDig(world, x, y, colour)', function() {
-        var testWorld = new dungeonGen._World('fakeDiv', 5, 5);
-        testWorld.stage = [
-            [1,1,1,1,1],
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0]
-        ];
+        var testWorld = new dungeonGen._World('fakeDiv', 3, 3);
 
         it('should confirm diggable tile', function() {
-            console.log(testWorld);
+          testWorld.stage = [
+              [1,1,1,],
+              [0,0,0,],
+              [0,0,0,],
+          ];
             var colour = 1;
-            expect(dungeonGen._canDig(testWorld, 1, 2, colour)).to.eql(true);
+            expect(dungeonGen._canDig(testWorld, 1, 1, colour)).to.eql(true);
+        });
+
+        it('should not confirm diagonal diggable tile', function() {
+            testWorld.stage = [
+                [1,1,1,],
+                [1,0,0,],
+                [0,0,0,],
+            ];
+            var colour = 1;
+            expect(dungeonGen._canDig(testWorld, 2, 1, colour)).to.eql(false);
+        });
+
+        it('should not confirm surrounded diggable tile', function() {
+            testWorld.stage = [
+                [1,1,1,],
+                [1,0,0,],
+                [0,0,0,],
+            ];
+            var colour = 1;
+            expect(dungeonGen._canDig(testWorld, 1, 1, colour)).to.eql(false);
+        });
+
+        it('should not confirm tile that is already dug', function() {
+            testWorld.stage = [
+                [1,1,1,],
+                [1,0,0,],
+                [0,0,0,],
+            ];
+            var colour = 1;
+            expect(dungeonGen._canDig(testWorld, 0, 0, colour)).to.eql(false);
         });
     });
 });
