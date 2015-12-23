@@ -29,7 +29,7 @@ describe('dungeon generator', function() {
         });
     });
 
-    describe('#canDig(world, x, y, colour)', function() {
+    xdescribe('#canDig(world, x, y, colour)', function() {
         var testWorld = new dungeonGen._World('fakeDiv', 3, 3);
 
         it('should confirm diggable tile', function() {
