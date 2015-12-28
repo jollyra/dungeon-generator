@@ -14,7 +14,7 @@ describe('dungeon generator', function() {
             expect(dungeonGen._joinGraphs(forest, g1, g2)).to.eql([[1,2,3,4,5,6]]);
         });
 
-        xit('should throw an index out of bounds exception', function() {
+        it('should throw an index out of bounds exception', function() {
             var forest = [[1,2]];
             var g1 = 0;
             var g2 = 1;
@@ -29,7 +29,7 @@ describe('dungeon generator', function() {
         });
     });
 
-    xdescribe('#canDig(world, x, y, colour)', function() {
+    describe('#canDig(world, x, y, colour)', function() {
         var testWorld = new dungeonGen._World('fakeDiv', 3, 3);
 
         it('should confirm diggable tile', function() {
